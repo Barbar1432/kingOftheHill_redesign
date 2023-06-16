@@ -360,11 +360,11 @@ class moveGenerator:
             pass
         return possible_moves_list
 
-    def legalMoves(self,board,positions,isMax,can_castle):
+    def legalMoves(self,board,positions,isMax,can_castle_right,can_castle_left):
             legalMoves = {}
 
             row_indices, col_indices = positions
-            x = self.castling_eligible(board, isMax, can_castle)
+            x = self.castling_eligible(board, isMax, can_castle_right,can_castle_left)
 
             for row, col in zip(row_indices, col_indices):
                 pos = (row, col)
@@ -440,7 +440,7 @@ class moveGenerator:
         board[a][b] = dest
         return False
 
-    def castling_eligible (self,board,isMax,can_castle):
+    def castling_eligible (self,board,isMax,can_castle_right,can_castle_left):
         row= 0
         if isMax:
             row = 7
@@ -448,8 +448,9 @@ class moveGenerator:
             row = 0
         if ((board[row][5]!= 0 or board[row][6]!=0) and (board[row][3]!= 0 or board[row][2]!=0 )):
                 return None
-        if can_castle== False:
+        if can_castle_right== False and can_castle_left==False:
             return None
+
         if(board[row][5] == 0 and board[row][6] == 0):
                if( self.is_king_threatened((row,4),(row,5),isMax,board) == False) and (self.is_king_threatened((row,4),(row,6),isMax,board)== False):
                   return (row,6)
