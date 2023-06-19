@@ -19,15 +19,16 @@ def main():
 
     # Create an instance of the Board class
     chess_board = Board()
+    AI = True
 
     selected_square = None  # Store the selected square coordinates
 
     running = True
     while running:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Get the position of the mouse click
                 mouse_pos = pygame.mouse.get_pos()
@@ -43,15 +44,18 @@ def main():
                 else:
                     # A square is already selected, move the piece to the new square
                     new_row, new_col = clicked_row, clicked_col
-                    sqDest =(new_row,new_col)
+                    sqDest = (new_row, new_col)
 
                     # Perform the move operation in your chess engine or game logic
                     # ...
                     # Update the chess board accordingly
-                    chess_board.move_piece(selected_square,sqDest)
+
+                    chess_board.move_piece(selected_square, sqDest,chess_board.chessBoard)
 
                     # Reset the selected square
                     selected_square = None
+        if chess_board.isMax == False :
+           chess_board.bot_plays()
 
         # Clear the screen
         screen.fill(DARK_GREEN)
