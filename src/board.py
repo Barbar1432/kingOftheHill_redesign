@@ -54,7 +54,7 @@ class Board:
             positions = np.where(chessBoard < 0)
             move_dict = self.move_generator.legalMoves(chessBoard, positions, self.isMax, self.can_castle_black_right,self.can_castle_black_left)
         if (self.isMax and chessBoard[from_row][from_col] <= 0) or (not self.isMax and chessBoard[from_row][from_col] >= 0):
-            print ("invalid  move")
+            #print ("invalid  move")
             return
 
         if  move_dict[sqSelected].__contains__(sqDest):
@@ -63,7 +63,7 @@ class Board:
            chessBoard[from_row][from_col] = 0
            self.isMax = not self.isMax
            self.castle_move(sqSelected,sqDest)
-           print(self.evaluation(self.chessBoard))
+           #print(self.evaluation(self.chessBoard))
 
 
             
@@ -181,7 +181,7 @@ class Board:
         _, path = self.alpha_beta(self.chessBoard, 2, float("-inf"), float("inf"), self.isMax)
         move = path[0]
         sqSelected,sqDest =move
-        print(sqSelected)
+        #print(sqSelected)
 
         self.move_piece(sqSelected,sqDest,self.chessBoard)
         return sqSelected,sqDest
@@ -196,7 +196,7 @@ class Board:
             positions = np.where(chessBoard < 0)
             move_dict = self.move_generator.legalMoves(chessBoard, positions, isMax, self.can_castle_black_right,self.can_castle_black_left)
         if (isMax and chessBoard[from_row][from_col] <= 0) or (not isMax and chessBoard[from_row][from_col] >= 0):
-            print ("invalid  move")
+            #print ("invalid  move")
             return
 
         if  move_dict[sqSelected].__contains__(sqDest):
@@ -205,10 +205,42 @@ class Board:
            chessBoard[from_row][from_col] = 0
            isMax = not isMax
            self.castle_move(sqSelected,sqDest)
-           print(self.evaluation(self.chessBoard))
+           #print(self.evaluation(self.chessBoard))
 
 
-
+    ### For Benchmarktests - Counting how many boards are visited ###
+    def alpha_beta_count(self, node, depth, alpha, beta, is_max, k=0, path=[]):
+        k += 1
+        if depth == 0:
+            return self.evaluation(node), path, k
+        if is_max:
+            best_value = alpha
+            best_path = None
+            for child_move, child_value,  in self.generate_child_node(node):
+                child_board = np.copy(node)
+                self.move_piece_alphabeta(child_move, child_value, child_board,True)  # Update the board with the move
+                value, child_path, k = self.alpha_beta_count(child_board, depth - 1, best_value, beta, False, k,
+                                                    path + [(child_move,child_value)])
+                if value > best_value:
+                    best_value = value
+                    best_path = child_path
+                if best_value >= beta:  # Beta-Cutoff
+                    break
+            return best_value, best_path, k
+        else:
+            best_value = beta
+            best_path = None
+            for child_move, child_value in self.generate_child_node(node):
+                child_board = np.copy(node)
+                self.move_piece_alphabeta(child_move, child_value, child_board,False)  # Update the board with the move
+                value, child_path, k = self.alpha_beta_count(child_board, depth - 1, alpha, best_value, True, k,
+                                                    path + [(child_move,child_value)])
+                if value < best_value:
+                    best_value = value
+                    best_path = child_path
+                if best_value <= alpha:  # Alpha-Cutoff
+                    break
+            return best_value, best_path, k
 
 
 
