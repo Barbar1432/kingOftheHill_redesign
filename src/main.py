@@ -52,10 +52,14 @@ def main():
 
                     chess_board.move_piece(selected_square, sqDest,chess_board.chessBoard)
 
+                    chess_board.draw_board(screen)
+                    pygame.display.flip()
+
                     # Reset the selected square
                     selected_square = None
         if chess_board.isMax == False :
-           chess_board.bot_plays()
+            if chess_board.bot_plays() == -1:
+                pygame.display.set_caption("Game Over")
 
         # Clear the screen
         screen.fill(DARK_GREEN)

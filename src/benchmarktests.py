@@ -3,7 +3,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import random
-from board import Board
+from board import Board, alpha_beta_count
 from tests import FENtoBoard
 from moveGenerator import moveGenerator
 
@@ -112,7 +112,7 @@ def alpha_beta_depth1():
     if color == 'black':
         a_b_board_1.isMax = False
     move_generator = moveGenerator()
-    _, path, k = a_b_board_1.alpha_beta_count(a_b_board_1.chessBoard, 1, float("-inf"), float("inf"), a_b_board_1.isMax)
+    _, path, k = alpha_beta_count(a_b_board_1, 1, float("-inf"), float("inf"), a_b_board_1.isMax)
 
     move = path[0]
 
@@ -133,7 +133,7 @@ def alpha_beta_depth2():
     if color == 'black':
         a_b_board_2.isMax = False
     move_generator = moveGenerator()
-    _, path, k = a_b_board_2.alpha_beta_count(a_b_board_2.chessBoard, 2, float("-inf"), float("inf"), a_b_board_2.isMax)
+    _, path, k = alpha_beta_count(a_b_board_2, 2, float("-inf"), float("inf"), a_b_board_2.isMax)
 
     move = path[0]
 
@@ -152,7 +152,7 @@ def alpha_beta_depth3():
     if color == 'black':
         a_b_board_3.isMax = False
 
-    _, path, k = a_b_board_3.alpha_beta_count(a_b_board_3.chessBoard, 3, float("-inf"), float("inf"), a_b_board_3.isMax)
+    _, path, k = alpha_beta_count(a_b_board_3, 3, float("-inf"), float("inf"), a_b_board_3.isMax)
 
     move = path[0]
 
@@ -171,7 +171,7 @@ def alpha_beta_depth4():
     if color == 'black':
         a_b_board_4.isMax = False
 
-    _, path, k = a_b_board_4.alpha_beta_count(a_b_board_4.chessBoard, 4, float("-inf"), float("inf"), a_b_board_4.isMax)
+    _, path, k = alpha_beta_count(a_b_board_4, 4, float("-inf"), float("inf"), a_b_board_4.isMax)
 
     move = path[0]
 
@@ -267,19 +267,19 @@ elif testing == 1:
     #array11 = (
     #    timeit.repeat(stmt='min_max_depth1()', setup='from __main__ import min_max_depth1', repeat=1, number=1))
     array1 = (
-        timeit.repeat(stmt='alpha_beta_depth1()', setup='from __main__ import alpha_beta_depth1', repeat=5, number=1))
+        timeit.repeat(stmt='alpha_beta_depth1()', setup='from __main__ import alpha_beta_depth1', repeat=2, number=1))
     #array22 = (
     #    timeit.repeat(stmt='min_max_depth2()', setup='from __main__ import min_max_depth2', repeat=1, number=1))
     array2 = (
-        timeit.repeat(stmt='alpha_beta_depth2()', setup='from __main__ import alpha_beta_depth2', repeat=5, number=1))
+        timeit.repeat(stmt='alpha_beta_depth2()', setup='from __main__ import alpha_beta_depth2', repeat=2, number=1))
     #array33 = (
     #    timeit.repeat(stmt='min_max_depth3()', setup='from __main__ import min_max_depth3', repeat=1, number=1))
     array3 = (
-        timeit.repeat(stmt='alpha_beta_depth3()', setup='from __main__ import alpha_beta_depth3', repeat=5, number=1))
-    array4 = (
-        timeit.repeat(stmt='alpha_beta_depth4()', setup='from __main__ import alpha_beta_depth4', repeat=5, number=1))
-
-    x = range(1, 6)
+        timeit.repeat(stmt='alpha_beta_depth3()', setup='from __main__ import alpha_beta_depth3', repeat=2, number=1))
+    """array4 = (
+        timeit.repeat(stmt='alpha_beta_depth4()', setup='from __main__ import alpha_beta_depth4', repeat=2, number=1))
+"""
+    x = range(1, 3)
     # With Min-Max:
     """fig, axs = plt.subplots(3, 2)
     axs[0, 0].plot(x, array11, 'tab:blue')
@@ -312,8 +312,8 @@ elif testing == 1:
     axs[1, 0].set_title('AlphaBeta with Depth: 3')
     axs[1, 0].set_ylabel('time (s)')
     axs[1, 0].set_xlabel('repeat (n)')
-    axs[1, 1].plot(x, array4, 'tab:purple')
+    """axs[1, 1].plot(x, array4, 'tab:purple')
     axs[1, 1].set_title('AlphaBeta with Depth: 4')
-    axs[1, 1].set_xlabel('repeat (n)')
+    axs[1, 1].set_xlabel('repeat (n)')"""
     fig.tight_layout()
     plt.show()
