@@ -477,9 +477,8 @@ def returnAllMoves(b_board, t_board):
         can_castle_left = b_board.can_castle_black_left
         can_castle_right = b_board.can_castle_black_right
     moves = move_generator.legalMoves(b_board.chessBoard, positions, b_board.isMax, can_castle_right, can_castle_left)
-    za = move_generator.possible_moves_knight(b_board.chessBoard,(5,2))
-    print(za)
-    print(moves[(5,2)])
+
+
     list_of_possible_moves = []
     row_indices, col_indices = positions
     for row, col in zip(row_indices, col_indices):

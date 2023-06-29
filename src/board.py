@@ -9,6 +9,7 @@ SCREEN_HEIGHT = 480
 SQUARE_SIZE = 60
 DARK_GREEN = (79, 121, 66)
 LIGHT_GREEN = (158, 194, 133)
+transposition_table = {}
 
 class Board:
     def __init__(self):
@@ -122,6 +123,7 @@ class Board:
 
     def bot_plays(self):
         _, path = alpha_beta(self, 3, float("-inf"), float("inf"), self.isMax)
+        #print(k)
         if path is None or len(path) == 0:
             print("Game Over")
             return -1
@@ -168,6 +170,12 @@ class Board:
         self.chessBoard[row][col] = old_selected_piece
         self.chessBoard[row_d][col_d] = old_dest_piece
         self.isMax = not self.isMax
+
+        if old_selected_piece == 2000 and dest in ((4, 3), (3, 3), (3, 4), (4, 4)):
+            self.king_reached_the_hill = False
+        if old_selected_piece == -2000 and dest in ((4, 3), (3, 3), (3, 4), (4, 4)):
+            self.king_reached_the_hill = False
+
         # Last Move was a castling undo castle movement
         if old_b[0] != self.can_castle_black_right:
             if old_selected_piece == -2000 and dest == (0, 6):
@@ -195,9 +203,26 @@ class Board:
             self.can_castle_white_left = True
 
 
+
+
 def alpha_beta(board, depth, alpha, beta, is_max, path=[]):
     if depth == 0 or board.king_reached_the_hill or is_game_Over(board):
-        return evaluation(board.chessBoard, is_max), path
+        return evaluation(board.chessBoard), path
+
+    hash_key = board_hash(board.chessBoard)
+
+    if hash_key in transposition_table:
+        entry = transposition_table[hash_key]
+        if entry['depth'] >= depth:
+            if entry['flag'] == 'exact':
+                return entry['value'], entry['path']
+            elif entry['flag'] == 'lowerbound' and entry['value'] > alpha:
+                alpha = entry['value']
+            elif entry['flag'] == 'upperbound' and entry['value'] < beta:
+                beta = entry['value']
+            if alpha >= beta:
+                return entry['value'], entry['path']
+
     if is_max:
         best_value = alpha
         best_path = None
@@ -217,6 +242,14 @@ def alpha_beta(board, depth, alpha, beta, is_max, path=[]):
                 best_path = child_path
             if best_value >= beta:  # Beta-Cutoff
                 break
+
+        if best_value <= alpha:
+            flag = 'upperbound'
+        elif best_value >= beta:
+            flag = 'lowerbound'
+        else:
+            flag = 'exact'
+        transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
         return best_value, best_path
     else:
         best_value = beta
@@ -238,6 +271,15 @@ def alpha_beta(board, depth, alpha, beta, is_max, path=[]):
                 best_path = child_path
             if best_value <= alpha:  # Alpha-Cutoff
                 break
+
+        if best_value <= alpha:
+            flag = 'upperbound'
+        elif best_value >= beta:
+            flag = 'lowerbound'
+        else:
+            flag = 'exact'
+        transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
+
         return best_value, best_path
 
 
@@ -245,7 +287,9 @@ def alpha_beta(board, depth, alpha, beta, is_max, path=[]):
 def alpha_beta_count(board, depth, alpha, beta, is_max, k=0, path=[]):
     k += 1
     if depth == 0 or board.king_reached_the_hill or is_game_Over(board):
-        return evaluation(board.chessBoard, is_max), path, k
+        return evaluation(board.chessBoard), path, k
+
+
     if is_max:
         best_value = alpha
         best_path = None
@@ -265,6 +309,8 @@ def alpha_beta_count(board, depth, alpha, beta, is_max, k=0, path=[]):
                 best_path = child_path
             if best_value >= beta:  # Beta-Cutoff
                 break
+
+
         return best_value, best_path, k
     else:
         best_value = beta
@@ -286,10 +332,22 @@ def alpha_beta_count(board, depth, alpha, beta, is_max, k=0, path=[]):
                 best_path = child_path
             if best_value <= alpha:  # Alpha-Cutoff
                 break
+
+
         return best_value, best_path, k
 
+def board_hash(board):
+    hash = 0
+    for row in range(8):
+        for col in range(8):
+            if board[row][col] != 0:
+                piece = board[row][col]
+                position_of_board = (row) * 8 + (col + 1)
+                hash += (piece * position_of_board)
+    return hash
 
-def evaluation(board, isMax):
+
+def evaluation(board):
     whitePoints = 0
     blackPoints = 0
     pst = PST()
