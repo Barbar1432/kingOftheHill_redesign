@@ -410,11 +410,11 @@ class moveGenerator:
         if isMax:
            kingPos = np.where (board==2000)
            positions =np.where (board<0)
-        if isMax==False:
+        else:
             kingPos = np.where(board == -2000)
             positions = np.where(board >0)
-        king_row = kingPos[0].item()
-        king_col = kingPos[1].item()
+        king_row = kingPos[0]
+        king_col = kingPos[1]
         king = (king_row,king_col)
         row, column = start_pos
         a, b = des_pos
