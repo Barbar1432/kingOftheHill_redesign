@@ -12,7 +12,6 @@ DARK_GREEN = (79, 121, 66)
 LIGHT_GREEN = (158, 194, 133)
 transposition_table = {}
 
-
 class Board:
     def __init__(self):
         # Create the chess board
@@ -237,6 +236,8 @@ class Board:
                 flag = 'exact'
             transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
             return best_value, best_path
+
+
 
 
 

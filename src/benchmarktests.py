@@ -3,7 +3,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import random
-from board import Board, alpha_beta_count
+from board import Board
 from tests import FENtoBoard
 from moveGenerator import moveGenerator
 
@@ -102,142 +102,98 @@ def zug_generator_end():
 
 def alpha_beta_depth1():
     a_b_board_1 = Board()
-    board, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
-    enPassentSquareRow, enPassentSquareCol), halfMoveClock, fullMoveClock = FENtoBoard(board2)
-    a_b_board_1.chessBoard = board
-    a_b_board_1.can_castle_black_right = kingsideCastleBlack
+    board_d, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (enPassentSquareRow, enPassentSquareCol), \
+    halfMoveClock, fullMoveClock= FENtoBoard(board2)
+    a_b_board_1.chessBoard = board_d
     a_b_board_1.can_castle_black_left = queensideCastleBlack
-    a_b_board_1.can_castle_white_right = kingsideCastleWhite
+    a_b_board_1.can_castle_black_right = kingsideCastleBlack
     a_b_board_1.can_castle_white_left = queensideCastleWhite
+    a_b_board_1.can_castle_white_right = kingsideCastleWhite
     if color == 'black':
         a_b_board_1.isMax = False
-    move_generator = moveGenerator()
-    _, path, k = alpha_beta_count(a_b_board_1, 1, float("-inf"), float("inf"), a_b_board_1.isMax)
-
+    bewertung, path, k = a_b_board_1.alpha_beta_count(a_b_board_1.chessBoard, 1, float('-inf'), float('inf'), True)
     move = path[0]
 
     print("AlphaBeta depth 1 untersuchter Zustände: ", k)
-    print("Best Move Found: ", move)
-
-
 
 def alpha_beta_depth2():
     a_b_board_2 = Board()
-    board, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
-        enPassentSquareRow, enPassentSquareCol), halfMoveClock, fullMoveClock = FENtoBoard(board2)
-    a_b_board_2.chessBoard = board
-    a_b_board_2.can_castle_black_right = kingsideCastleBlack
+    board_d, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
+    enPassentSquareRow, enPassentSquareCol), \
+        halfMoveClock, fullMoveClock = FENtoBoard(board2)
+    a_b_board_2.chessBoard = board_d
     a_b_board_2.can_castle_black_left = queensideCastleBlack
-    a_b_board_2.can_castle_white_right = kingsideCastleWhite
+    a_b_board_2.can_castle_black_right = kingsideCastleBlack
     a_b_board_2.can_castle_white_left = queensideCastleWhite
+    a_b_board_2.can_castle_white_right = kingsideCastleWhite
     if color == 'black':
         a_b_board_2.isMax = False
-    move_generator = moveGenerator()
-    _, path, k = alpha_beta_count(a_b_board_2, 2, float("-inf"), float("inf"), a_b_board_2.isMax)
-
+    bewertung, path, k = a_b_board_2.alpha_beta_count(a_b_board_2.chessBoard, 2, float('-inf'), float('inf'), True)
     move = path[0]
-
     print("AlphaBeta depth 2 untersuchter Zustände: ", k)
-    print("Best Move Found: ", move)
-
 def alpha_beta_depth3():
     a_b_board_3 = Board()
-    board, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
-        enPassentSquareRow, enPassentSquareCol), halfMoveClock, fullMoveClock = FENtoBoard(board2)
-    a_b_board_3.chessBoard = board
-    a_b_board_3.can_castle_black_right = kingsideCastleBlack
+    board_d, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
+    enPassentSquareRow, enPassentSquareCol), \
+        halfMoveClock, fullMoveClock = FENtoBoard(board2)
+    a_b_board_3.chessBoard = board_d
     a_b_board_3.can_castle_black_left = queensideCastleBlack
-    a_b_board_3.can_castle_white_right = kingsideCastleWhite
+    a_b_board_3.can_castle_black_right = kingsideCastleBlack
     a_b_board_3.can_castle_white_left = queensideCastleWhite
+    a_b_board_3.can_castle_white_right = kingsideCastleWhite
     if color == 'black':
         a_b_board_3.isMax = False
-
-    _, path, k = alpha_beta_count(a_b_board_3, 3, float("-inf"), float("inf"), a_b_board_3.isMax)
-
+    bewertung, path, k = a_b_board_3.alpha_beta_count(a_b_board_3.chessBoard, 3, float('-inf'), float('inf'), True)
     move = path[0]
-
     print("AlphaBeta depth 3 untersuchter Zustände: ", k)
-    print("Best Move Found: ", move)
 
-def alpha_beta_depth4():
-    a_b_board_4 = Board()
-    board, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
-        enPassentSquareRow, enPassentSquareCol), halfMoveClock, fullMoveClock = FENtoBoard(board2)
-    a_b_board_4.chessBoard = board
-    a_b_board_4.can_castle_black_right = kingsideCastleBlack
-    a_b_board_4.can_castle_black_left = queensideCastleBlack
-    a_b_board_4.can_castle_white_right = kingsideCastleWhite
-    a_b_board_4.can_castle_white_left = queensideCastleWhite
+def alpha_beta_depth1q():
+    a_b_board_1 = Board()
+    board_d, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (enPassentSquareRow, enPassentSquareCol), \
+    halfMoveClock, fullMoveClock, = FENtoBoard(board2)
+    a_b_board_1.chessBoard = board_d
+    a_b_board_1.can_castle_black_left = queensideCastleBlack
+    a_b_board_1.can_castle_black_right = kingsideCastleBlack
+    a_b_board_1.can_castle_white_left = queensideCastleWhite
+    a_b_board_1.can_castle_white_right = kingsideCastleWhite
     if color == 'black':
-        a_b_board_4.isMax = False
-
-    _, path, k = alpha_beta_count(a_b_board_4, 4, float("-inf"), float("inf"), a_b_board_4.isMax)
-
+        a_b_board_1.isMax = False
+    bewertung, path, k = a_b_board_1.alpha_beta_with_quite_search_count(a_b_board_1.chessBoard, 1, float('-inf'), float('inf'), True)
     move = path[0]
 
+    print("AlphaBeta depth 1 untersuchter Zustände: ", k)
+
+def alpha_beta_depth2q():
+    a_b_board_2 = Board()
+    board_d, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
+    enPassentSquareRow, enPassentSquareCol), \
+        halfMoveClock, fullMoveClock = FENtoBoard(board2)
+    a_b_board_2.chessBoard = board_d
+    a_b_board_2.can_castle_black_left = queensideCastleBlack
+    a_b_board_2.can_castle_black_right = kingsideCastleBlack
+    a_b_board_2.can_castle_white_left = queensideCastleWhite
+    a_b_board_2.can_castle_white_right = kingsideCastleWhite
+    if color == 'black':
+        a_b_board_2.isMax = False
+    bewertung, path, k = a_b_board_2.alpha_beta_with_quite_search_count(a_b_board_2.chessBoard, 2, float('-inf'), float('inf'), True)
+    move = path[0]
+    print("AlphaBeta depth 2 untersuchter Zustände: ", k)
+def alpha_beta_depth3q():
+    a_b_board_3 = Board()
+    board_d, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
+    enPassentSquareRow, enPassentSquareCol), \
+        halfMoveClock, fullMoveClock = FENtoBoard(board2)
+    a_b_board_3.chessBoard = board_d
+    a_b_board_3.can_castle_black_left = queensideCastleBlack
+    a_b_board_3.can_castle_black_right = kingsideCastleBlack
+    a_b_board_3.can_castle_white_left = queensideCastleWhite
+    a_b_board_3.can_castle_white_right = kingsideCastleWhite
+    if color == 'black':
+        a_b_board_3.isMax = False
+    bewertung, path, k = a_b_board_3.alpha_beta_with_quite_search_count(a_b_board_3.chessBoard, 3, float('-inf'), float('inf'), True)
+    move = path[0]
     print("AlphaBeta depth 3 untersuchter Zustände: ", k)
-    print("Best Move Found: ", move)
 
-"""
-def min_max_depth1():
-    min_max_1 = Board()
-    board, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
-        enPassentSquareRow, enPassentSquareCol), halfMoveClock, fullMoveClock = FENtoBoard(board1)
-    min_max_1.chessBoard = board
-    min_max_1.can_castle_black_right = kingsideCastleBlack
-    min_max_1.can_castle_black_left = queensideCastleBlack
-    min_max_1.can_castle_white_right = kingsideCastleWhite
-    min_max_1.can_castle_white_left = queensideCastleWhite
-    if color == 'black':
-        min_max_1.isMax = False
-
-    _, path, k = min_max_1.min_max_count(min_max_1.chessBoard, 1, float('-inf'), float('inf'), min_max_1.isMax)
-
-    move = path[0]
-
-    print("MinMax depth 1 untersuchter Zustände: ", k)
-    print("Best Move Found: ", move)
-
-
-def min_max_depth2():
-    min_max_2 = Board()
-    board, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
-        enPassentSquareRow, enPassentSquareCol), halfMoveClock, fullMoveClock = FENtoBoard(board1)
-    min_max_2.chessBoard = board
-    min_max_2.can_castle_black_right = kingsideCastleBlack
-    min_max_2.can_castle_black_left = queensideCastleBlack
-    min_max_2.can_castle_white_right = kingsideCastleWhite
-    min_max_2.can_castle_white_left = queensideCastleWhite
-    if color == 'black':
-        min_max_2.isMax = False
-
-    _, path, k = min_max_2.min_max_count(min_max_2.chessBoard, 2, float('-inf'), float('inf'), min_max_2.isMax)
-
-    move = path[0]
-
-    print("MinMax depth 2 untersuchter Zustände: ", k)
-    print("Best Move Found: ", move)
-
-
-def min_max_depth3():
-    min_max_3 = Board()
-    board, color, kingsideCastleWhite, queensideCastleWhite, kingsideCastleBlack, queensideCastleBlack, (
-        enPassentSquareRow, enPassentSquareCol), halfMoveClock, fullMoveClock = FENtoBoard(board1)
-    min_max_3.chessBoard = board
-    min_max_3.can_castle_black_right = kingsideCastleBlack
-    min_max_3.can_castle_black_left = queensideCastleBlack
-    min_max_3.can_castle_white_right = kingsideCastleWhite
-    min_max_3.can_castle_white_left = queensideCastleWhite
-    if color == 'black':
-        min_max_3.isMax = False
-
-    _, path, k = min_max_3.min_max_count(min_max_3.chessBoard, 3, float('-inf'), float('inf'), min_max_3.isMax)
-
-    move = path[0]
-
-    print("MinMax depth 3 untersuchter Zustände: ", k)
-    print("Best Move Found: ", move)
-"""
 if (testing == 0):
     array1 = (
         timeit.repeat(stmt='zug_generator_starting()', setup='from __main__ import zug_generator_starting', repeat=5,
@@ -261,59 +217,160 @@ if (testing == 0):
     fig.tight_layout()
     plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4])
     plt.show()
+
 elif testing == 1:
-    array6 = (
+    array4 = (
         timeit.repeat(stmt='alpha_beta_depth1()', setup='from __main__ import alpha_beta_depth1', repeat=5, number=1))
-    #array11 = (
-    #    timeit.repeat(stmt='min_max_depth1()', setup='from __main__ import min_max_depth1', repeat=1, number=1))
     array1 = (
-        timeit.repeat(stmt='alpha_beta_depth1()', setup='from __main__ import alpha_beta_depth1', repeat=2, number=1))
-    #array22 = (
-    #    timeit.repeat(stmt='min_max_depth2()', setup='from __main__ import min_max_depth2', repeat=1, number=1))
+        timeit.repeat(stmt='alpha_beta_depth1()', setup='from __main__ import alpha_beta_depth1', repeat=3, number=1))
     array2 = (
-        timeit.repeat(stmt='alpha_beta_depth2()', setup='from __main__ import alpha_beta_depth2', repeat=2, number=1))
-    #array33 = (
-    #    timeit.repeat(stmt='min_max_depth3()', setup='from __main__ import min_max_depth3', repeat=1, number=1))
+        timeit.repeat(stmt='alpha_beta_depth2()', setup='from __main__ import alpha_beta_depth2', repeat=3, number=1))
     array3 = (
-        timeit.repeat(stmt='alpha_beta_depth3()', setup='from __main__ import alpha_beta_depth3', repeat=2, number=1))
-    """array4 = (
-        timeit.repeat(stmt='alpha_beta_depth4()', setup='from __main__ import alpha_beta_depth4', repeat=2, number=1))
-"""
-    x = range(1, 3)
-    # With Min-Max:
-    """fig, axs = plt.subplots(3, 2)
-    axs[0, 0].plot(x, array11, 'tab:blue')
-    axs[0, 0].set_title('MinMax with Depth: 1')
+        timeit.repeat(stmt='alpha_beta_depth3()', setup='from __main__ import alpha_beta_depth3', repeat=3, number=1))
+    array11 = (
+        timeit.repeat(stmt='alpha_beta_depth1q()', setup='from __main__ import alpha_beta_depth1q', repeat=3, number=1))
+    array22 = (
+        timeit.repeat(stmt='alpha_beta_depth2q()', setup='from __main__ import alpha_beta_depth2q', repeat=3, number=1))
+    array33 = (
+        timeit.repeat(stmt='alpha_beta_depth3q()', setup='from __main__ import alpha_beta_depth3q', repeat=3, number=1))
+
+    x = range(1, 4)
+    fig, axs = plt.subplots(3, 2)
+    axs[0, 0].plot(x, array1, 'tab:blue')
+    axs[0, 0].set_title('AlphaBeta with Depth: 2')
     axs[0, 0].set_ylabel('time (s)')
-    axs[0, 1].plot(x, array1, 'tab:cyan')
-    axs[0, 1].set_title('AlphaBeta with Depth: 1')
-    axs[1, 0].plot(x, array22, 'tab:red')
-    axs[1, 0].set_title('MinMax with Depth: 2')
-    axs[1, 0].set_ylabel('time (s)')
-    axs[1, 1].plot(x, array2, 'tab:orange')
-    axs[1, 1].set_title('AlphaBeta with Depth: 2')
-    axs[2, 0].plot(x, array33, 'tab:purple')
-    axs[2, 0].set_title('MinMax with Depth: 3')
-    axs[2, 0].set_ylabel('time (s)')
-    axs[2, 0].set_xlabel('repeat (n)')
-    axs[2, 1].plot(x, array3, 'tab:pink')
-    axs[2, 1].set_title('AlphaBeta with Depth: 3')
-    axs[2, 1].set_xlabel('repeat(n)')
-    fig.tight_layout()
-    plt.show()"""
-    # Without Min-Max:
-    fig, axs = plt.subplots(2, 2)
-    axs[0, 0].plot(x, array1)
-    axs[0, 0].set_title('AlphaBeta with Depth: 1')
-    axs[0, 0].set_ylabel('time (s)')
-    axs[0, 1].plot(x, array2, 'tab:green')
-    axs[0, 1].set_title('AlphaBeta with Depth: 2')
-    axs[1, 0].plot(x, array3, 'tab:red')
+    axs[0, 1].plot(x, array11, 'tab:cyan')
+    axs[0, 1].set_title('AlphaBeta with Quite Search Depth: 1')
+    axs[1, 0].plot(x, array2, 'tab:red')
     axs[1, 0].set_title('AlphaBeta with Depth: 3')
     axs[1, 0].set_ylabel('time (s)')
-    axs[1, 0].set_xlabel('repeat (n)')
-    """axs[1, 1].plot(x, array4, 'tab:purple')
-    axs[1, 1].set_title('AlphaBeta with Depth: 4')
-    axs[1, 1].set_xlabel('repeat (n)')"""
+    axs[1, 1].plot(x, array22, 'tab:orange')
+    axs[1, 1].set_title('AlphaBeta with Quite Search Depth: 2')
+    axs[2, 0].plot(x, array3, 'tab:purple')
+    axs[2, 0].set_title('AlphaBeta with Depth: 4')
+    axs[2, 0].set_ylabel('time (s)')
+    axs[2, 0].set_xlabel('repeat (n)')
+    axs[2, 1].plot(x, array33, 'tab:pink')
+    axs[2, 1].set_title('AlphaBeta with Quite Search Depth: 3')
+    axs[2, 1].set_xlabel('repeat(n)')
     fig.tight_layout()
     plt.show()
+
+
+
+
+# Count Functions - For testing add these in class Board():
+"""
+def quite_search_count(self, node, depth, alpha, beta, is_max, k, path):  # Quiescence search
+    if is_max:
+        best_value = alpha
+        best_path = None
+        for child_move, child_value in self.generate_child_node(node, is_max):
+            if not self.is_quite_move(child_move, child_value):
+                k += 1
+                child_board = np.copy(node)
+                self.move_piece_alphabeta(child_move, child_value, child_board,
+                                          True)  # Update the board with the move
+                value = self.eval.board_evaluation(node, self.move_count)
+                child_path = [(child_move, child_value)]
+                if value > best_value:
+                    best_value = value
+                    best_path = path + child_path
+                if best_value >= beta:
+                    break
+        return best_value, best_path, k
+
+    else:
+        best_value = beta
+        best_path = None
+        for child_move, child_value, in self.generate_child_node(node, is_max):
+            if not self.is_quite_move(child_move, child_value):
+                k += 1
+                child_board = np.copy(node)
+                self.move_piece_alphabeta(child_move, child_value, child_board,
+                                          True)  # Update the board with the move
+                value = self.eval.board_evaluation(node, self.move_count)
+                child_path = [(child_move, child_value)]
+                if value < best_value:
+                    best_value = value
+                    best_path = path + child_path
+                if best_value <= alpha:
+                    break
+        return best_value, best_path, k
+
+def alpha_beta_with_quite_search_count(self, node, depth, alpha, beta, is_max, k=0, path=[]):
+    k += 1
+    if self.gameOver(node, is_max):
+        return self.eval.board_evaluation(node,self.move_count), path, k
+    if depth == 0:
+        # Quiescence search
+        value, child_path, k = self.quite_search_count(node, depth, alpha, beta, is_max, k, path)
+        return value, child_path, k
+    if is_max:
+        best_value = alpha
+        best_path = None
+        for child_move, child_value, in self.generate_child_node(node,is_max):
+            child_board = np.copy(node)
+            self.move_piece_alphabeta(child_move, child_value, child_board, True) # Update the board with the move
+
+            value, child_path, k = self.alpha_beta_with_quite_search_count(child_board, depth - 1, best_value, beta, False, k,
+                                                                  path + [(child_move, child_value)])
+            if value > best_value:
+                best_value = value
+                best_path = child_path
+            if best_value >= beta:  # Beta-Cutoff
+                break
+        return best_value, best_path, k
+    else:
+        best_value = beta
+        best_path = None
+        for child_move, child_value in self.generate_child_node(node,is_max):
+            child_board = np.copy(node)
+            self.move_piece_alphabeta(child_move, child_value, child_board, False)# Update the board with the move
+
+            value, child_path, k = self.alpha_beta_with_quite_search_count(child_board, depth - 1, alpha, best_value, True, k,
+                                                path + [(child_move, child_value)])
+            if value < best_value:
+                best_value = value
+                best_path = child_path
+            if best_value <= alpha:  # Alpha-Cutoff
+                break
+        return best_value, best_path, k
+
+def alpha_beta_count(self, node, depth, alpha, beta, is_max, k=0, path=[]):
+    k += 1
+    if depth == 0 or self.gameOver(node, is_max):
+        return self.eval.board_evaluation(node,self.move_count), path, k
+    if is_max:
+        best_value = alpha
+        best_path = None
+        for child_move, child_value, in self.generate_child_node(node,is_max):
+            child_board = np.copy(node)
+            self.move_piece_alphabeta(child_move, child_value, child_board, True) # Update the board with the move
+
+            value, child_path, k = self.alpha_beta_count(child_board, depth - 1, best_value, beta, False, k,
+                                                path + [(child_move, child_value)])
+            if value > best_value:
+                best_value = value
+                best_path = child_path
+            if best_value >= beta:  # Beta-Cutoff
+                break
+        return best_value, best_path, k
+    else:
+        best_value = beta
+        best_path = None
+        for child_move, child_value in self.generate_child_node(node,is_max):
+            child_board = np.copy(node)
+            self.move_piece_alphabeta(child_move, child_value, child_board, False)# Update the board with the move
+
+            value, child_path, k = self.alpha_beta_count(child_board, depth - 1, alpha, best_value, True, k,
+                                                path + [(child_move, child_value)])
+            if value < best_value:
+                best_value = value
+                best_path = child_path
+            if best_value <= alpha:  # Alpha-Cutoff
+                break
+        return best_value, best_path, k
+"""
+
+

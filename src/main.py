@@ -13,6 +13,7 @@ def main():
     # Initialize Pygame
     pygame.init()
 
+
     # Set up the screen
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Chess Board")
@@ -52,6 +53,8 @@ def main():
 
                     chess_board.move_piece(selected_square, sqDest,chess_board.chessBoard)
 
+                    # Draw played chess board
+
                     chess_board.draw_board(screen)
                     pygame.display.flip()
 
@@ -72,9 +75,17 @@ def main():
             selected_row, selected_col = selected_square
             pygame.draw.rect(screen, (0, 255, 0), (selected_col * SQUARE_SIZE, selected_row * SQUARE_SIZE,
                                                    SQUARE_SIZE, SQUARE_SIZE), 4)
+        # Highlight the last played move
+        if chess_board.last_move is not None:
+            selected, dest = chess_board.last_move
+            pygame.draw.rect(screen, (60, 179, 113), (selected[1] * SQUARE_SIZE, selected[0] * SQUARE_SIZE,
+                                                   SQUARE_SIZE, SQUARE_SIZE), 4)
+            pygame.draw.rect(screen, (60, 179, 113), (dest[1] * SQUARE_SIZE, dest[0] * SQUARE_SIZE,
+                                                   SQUARE_SIZE, SQUARE_SIZE), 4)
 
         # Update the display
         pygame.display.flip()
+
 
     # Quit the game
     pygame.quit()
