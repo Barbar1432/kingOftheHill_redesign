@@ -53,11 +53,16 @@ def main():
 
                     chess_board.move_piece(selected_square, sqDest,chess_board.chessBoard)
 
+                    # Draw played chess board
+
+                    chess_board.draw_board(screen)
+                    pygame.display.flip()
 
                     # Reset the selected square
                     selected_square = None
         if chess_board.isMax == False :
-           chess_board.bot_plays()
+            if chess_board.bot_plays() == -1:
+                pygame.display.set_caption("Game Over")
 
         # Clear the screen
         screen.fill(DARK_GREEN)
@@ -69,6 +74,13 @@ def main():
         if selected_square is not None:
             selected_row, selected_col = selected_square
             pygame.draw.rect(screen, (0, 255, 0), (selected_col * SQUARE_SIZE, selected_row * SQUARE_SIZE,
+                                                   SQUARE_SIZE, SQUARE_SIZE), 4)
+        # Highlight the last played move
+        if chess_board.last_move is not None:
+            selected, dest = chess_board.last_move
+            pygame.draw.rect(screen, (60, 179, 113), (selected[1] * SQUARE_SIZE, selected[0] * SQUARE_SIZE,
+                                                   SQUARE_SIZE, SQUARE_SIZE), 4)
+            pygame.draw.rect(screen, (60, 179, 113), (dest[1] * SQUARE_SIZE, dest[0] * SQUARE_SIZE,
                                                    SQUARE_SIZE, SQUARE_SIZE), 4)
 
         # Update the display

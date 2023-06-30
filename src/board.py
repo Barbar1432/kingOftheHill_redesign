@@ -32,7 +32,8 @@ class Board:
         self.can_castle_black_right = True
         self.move_generator = moveGenerator()
         self.eval = evaluation()
-        self.move_count =0
+        self.last_move = None
+        self.move_count = 0
 
     def draw_board(self, screen):
         for row in range(8):
@@ -72,6 +73,7 @@ class Board:
             self.castle_move(sqSelected, sqDest)
             self.eval.board_evaluation(chessBoard,self.move_count)
             self.move_count+=1
+            self.last_move = (sqSelected, sqDest)
 
 
 
@@ -154,6 +156,9 @@ class Board:
 
     def bot_plays(self):
         _, path = self.alpha_beta(self.chessBoard, 2, float("-inf"), float("inf"), self.isMax)
+        # Game is over
+        if path == [] or None:
+            return -1
         move = path[0]
         sqSelected, sqDest = move
         print(sqSelected)
