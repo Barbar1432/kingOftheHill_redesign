@@ -121,9 +121,54 @@ class Board:
                 child_node_list.append((key, value))  # Store the move and resulting board
         return child_node_list
 
+    def is_quite_move(self, seq, dest):  # Check if the move is quite
+        if dest != 0 or self.move_generator.is_king_threatened(seq, dest, self.isMax, self.chessBoard):
+            return 0
+        else:
+            return 1
+
+    def quite_search(self, node, depth, alpha, beta, is_max, path):  # Quiescence search
+        if is_max:
+            best_value = alpha
+            best_path = None
+            for child_move, child_value, in self.generate_child_node(node, is_max):
+                if not self.is_quite_move(child_move, child_value):
+                    child_board = np.copy(node)
+                    self.move_piece_alphabeta(child_move, child_value, child_board,
+                                              True)  # Update the board with the move
+                    value = self.eval.board_evaluation(node, self.move_count)
+                    child_path = [(child_move, child_value)]
+                    if value > best_value:
+                        best_value = value
+                        best_path = path + child_path
+                    if best_value >= beta:
+                        break
+            return best_value, best_path
+
+        else:
+            best_value = beta
+            best_path = None
+            for child_move, child_value, in self.generate_child_node(node, is_max):
+                if not self.is_quite_move(child_move, child_value):
+                    child_board = np.copy(node)
+                    self.move_piece_alphabeta(child_move, child_value, child_board,
+                                              True)  # Update the board with the move
+                    value = self.eval.board_evaluation(node, self.move_count)
+                    child_path = [(child_move, child_value)]
+                    if value < best_value:
+                        best_value = value
+                        best_path = path + child_path
+                    if best_value <= alpha:
+                        break
+            return best_value, best_path
+
     def alpha_beta(self, node, depth, alpha, beta, is_max, path=[]):
-        if depth == 0 or self.gameOver(node,is_max):
+        if self.gameOver(node, is_max):
             return self.eval.board_evaluation(node,self.move_count), path
+        if depth == 0:
+            # Quiescence search
+            value, child_path = self.quite_search(node, depth, alpha, beta, is_max, path)
+            return value, child_path
         if is_max:
             best_value = alpha
             best_path = None
@@ -180,11 +225,15 @@ class Board:
                 return True
         if isMax:
           positions = np.where(board > 0)
-          if len (self.move_generator.legalMoves(board, positions, isMax, self.can_castle_white_right,self.can_castle_white_left))==0:
+          moves = self.move_generator.legalMoves(board, positions, isMax, self.can_castle_white_right,
+                                                 self.can_castle_white_left)
+          if all(element == [] for element in list(moves.values())):
              return True
-        if not isMax:
+        else:
             positions = np.where(board < 0)
-            if len( self.move_generator.legalMoves(board, positions, self.isMax, self.can_castle_black_right,self.can_castle_black_left)) ==0:
+            moves = self.move_generator.legalMoves(board, positions, isMax, self.can_castle_white_right,
+                                                   self.can_castle_white_left)
+            if all(element == [] for element in list(moves.values())):
                 return True
         return False
 
