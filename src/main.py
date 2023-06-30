@@ -13,6 +13,7 @@ def main():
     # Initialize Pygame
     pygame.init()
 
+
     # Set up the screen
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Chess Board")
@@ -52,6 +53,7 @@ def main():
 
                     chess_board.move_piece(selected_square, sqDest,chess_board.chessBoard)
 
+
                     # Reset the selected square
                     selected_square = None
         if chess_board.isMax == False :
@@ -71,6 +73,7 @@ def main():
 
         # Update the display
         pygame.display.flip()
+
 
     # Quit the game
     pygame.quit()
