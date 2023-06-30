@@ -3,6 +3,7 @@ import pygame
 from moveGenerator import moveGenerator
 from PST import PST
 from evaluation import evaluation
+from hash_board import hash_board
 
 # Constants for colors, screen size, and square size
 SCREEN_WIDTH = 480
@@ -10,6 +11,7 @@ SCREEN_HEIGHT = 480
 SQUARE_SIZE = 60
 DARK_GREEN = (79, 121, 66)
 LIGHT_GREEN = (158, 194, 133)
+transposition_table = {}
 
 
 class Board:
@@ -163,6 +165,23 @@ class Board:
             return best_value, best_path
 
     def alpha_beta(self, node, depth, alpha, beta, is_max, path=[]):
+        originalAlpha = alpha
+
+        hash_key = self.board_hash(node)
+        if hash_key in transposition_table:
+
+            entry = transposition_table[hash_key]
+            if entry['depth'] >= depth:
+                if entry['flag'] == 'exact':
+
+                    return entry['value'], entry['path']
+
+                elif entry['flag'] == 'lowerbound':
+                    alpha = max(alpha, entry['value'])
+                elif entry['flag'] == 'upperbound':
+                    beta = min(beta, entry['value'])
+                if alpha >= beta:
+                    return entry['value'], entry['path']
         if self.gameOver(node, is_max):
             return self.eval.board_evaluation(node,self.move_count), path
         if depth == 0:
@@ -182,6 +201,14 @@ class Board:
                     best_path = child_path
                 if best_value >= beta:  # Beta-Cutoff
                     break
+
+            if best_value <= alpha:
+                flag = 'upperbound'
+            elif best_value >= beta:
+                flag = 'lowerbound'
+            else:
+                flag = 'exact'
+            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
             return best_value, best_path
         else:
             best_value = beta
@@ -197,10 +224,18 @@ class Board:
                     best_path = child_path
                 if best_value <= alpha:  # Alpha-Cutoff
                     break
+
+            if best_value <= alpha:
+                flag = 'upperbound'
+            elif best_value >= beta:
+                flag = 'lowerbound'
+            else:
+                flag = 'exact'
+            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
             return best_value, best_path
 
     def bot_plays(self):
-        _, path = self.alpha_beta(self.chessBoard, 2, float("-inf"), float("inf"), self.isMax)
+        _, path = self.alpha_beta(self.chessBoard, 3, float("-inf"), float("inf"), self.isMax)
         # Game is over
         if path == [] or path is None:
             return -1
@@ -210,6 +245,20 @@ class Board:
         self.move_piece(sqSelected, sqDest, self.chessBoard)
         self.move_count += 1
         return sqSelected, sqDest
+
+    def board_hash(self, board):
+        hashBoard = hash_board()
+
+        result = 0
+        for row in range(8):
+            for col in range(8):
+                if board[row][col] != 0:
+                    piece = board[row][col]
+                    position_of_board = (row) * 8 + (col + 1)
+                    select_key = hashBoard.real_realhash[position_of_board]
+                    result ^= select_key[piece]
+
+        return result
 
     def move_piece_alphabeta(self, sqSelected, sqDest, chessBoard, isMax):
             from_row, from_col = sqSelected
