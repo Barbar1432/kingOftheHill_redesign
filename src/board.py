@@ -157,7 +157,7 @@ class Board:
     def bot_plays(self):
         _, path = self.alpha_beta(self.chessBoard, 2, float("-inf"), float("inf"), self.isMax)
         # Game is over
-        if path == [] or None:
+        if path == [] or path is None:
             return -1
         move = path[0]
         sqSelected, sqDest = move
