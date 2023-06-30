@@ -155,11 +155,120 @@ class Board:
         else:
             #print(1 ,"ÇIKTIIII")
             return 1
+    def quite_search_count(self, node, depth, alpha, beta, is_max, k, path):  # Quiescence search
+        k += 1
+        if is_max:
+            best_value = alpha
+            best_path = path
+            for child_move, child_value, in self.generate_child_node(node, is_max):
+                if not self.is_quite_move(child_move, child_value):
+                    child_board = np.copy(node)
+                    self.move_piece_alphabeta(child_move, child_value, child_board,
+                                              True)  # Update the board with the move
+                    value = self.eval.board_evaluation(child_board, self.move_count)
+                    child_path = [(child_move, child_value)]
+                    if value > best_value:
+                        best_value = value
+                        best_path = path + child_path
+                    if best_value >= beta:
+                        break
+            return best_value, best_path, k
+
+        else:
+            best_value = beta
+            best_path = path
+            for child_move, child_value, in self.generate_child_node(node, is_max):
+                if not self.is_quite_move(child_move, child_value):
+                    child_board = np.copy(node)
+                    self.move_piece_alphabeta(child_move, child_value, child_board,
+                                              False)  # Update the board with the move
+                    value = self.eval.board_evaluation(child_board, self.move_count)
+                    child_path = [(child_move, child_value)]
+                    if value < best_value:
+                        best_value = value
+                        best_path = path + child_path
+                    if best_value <= alpha:
+                        break
+            return best_value, best_path, k
+
+    def alpha_beta_count(self, node, depth, alpha, beta, is_max, k=0, path=[]):
+        originalAlpha = alpha
+
+        hash_key = self.board_hash(node)
+        if hash_key in transposition_table:
+
+            entry = transposition_table[hash_key]
+            if entry['depth'] >= depth:
+                if entry['flag'] == 'exact':
+
+                    return entry['value'], entry['path'], k
+
+                elif entry['flag'] == 'lowerbound':
+                    alpha = max(alpha, entry['value'])
+                elif entry['flag'] == 'upperbound':
+                    beta = min(beta, entry['value'])
+                if alpha >= beta:
+                    return entry['value'], entry['path'], k
+        k += 1
+        if self.gameOver(node, is_max):
+            return self.eval.board_evaluation(node, self.move_count), path, k
+        """if depth == 0:
+            return self.eval.board_evaluation(node, self.move_count), path, k"""
+        if depth == 0:
+            # Quiescence search
+            value, child_path, k = self.quite_search_count(node, depth, alpha, beta, is_max, k, path)
+            return value, child_path, k
+        if is_max:
+            best_value = alpha
+            best_path = None
+            for child_move, child_value, in self.generate_child_node(node, is_max):
+                child_board = np.copy(node)
+                self.move_piece_alphabeta(child_move, child_value, child_board, True)  # Update the board with the move
+
+                value, child_path, k = self.alpha_beta_count(child_board, depth - 1, best_value, beta, False, k,
+                                                             path + [(child_move, child_value)])
+                if value > best_value:
+                    best_value = value
+                    best_path = child_path
+                if best_value >= beta:  # Beta-Cutoff
+                    break
+
+            if best_value <= alpha:
+                flag = 'upperbound'
+            elif best_value >= beta:
+                flag = 'lowerbound'
+            else:
+                flag = 'exact'
+            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
+            return best_value, best_path, k
+        else:
+            best_value = beta
+            best_path = None
+            for child_move, child_value in self.generate_child_node(node, is_max):
+                child_board = np.copy(node)
+                self.move_piece_alphabeta(child_move, child_value, child_board, False)  # Update the board with the move
+
+                value, child_path, k = self.alpha_beta_count(child_board, depth - 1, alpha, best_value, True, k,
+                                                             path + [(child_move, child_value)])
+                if value < best_value:
+                    best_value = value
+                    best_path = child_path
+                if best_value <= alpha:  # Alpha-Cutoff
+                    break
+
+            if best_value <= alpha:
+                flag = 'upperbound'
+            elif best_value >= beta:
+                flag = 'lowerbound'
+            else:
+                flag = 'exact'
+            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
+            return best_value, best_path, k
 
     def quite_search(self, node, depth, alpha, beta, is_max, path):  # Quiescence search
         if is_max:
             best_value = alpha
-            best_path = None
+            best_path = path
             for child_move, child_value, in self.generate_child_node(node, is_max):
                 if not self.is_quite_move(child_move, child_value):
                     child_board = np.copy(node)
@@ -176,12 +285,12 @@ class Board:
 
         else:
             best_value = beta
-            best_path = None
+            best_path = path
             for child_move, child_value, in self.generate_child_node(node, is_max):
                 if not self.is_quite_move(child_move, child_value):
                     child_board = np.copy(node)
                     self.move_piece_alphabeta(child_move, child_value, child_board,
-                                              True)  # Update the board with the move
+                                              False)  # Update the board with the move
                     value = self.eval.board_evaluation(node, self.move_count)
                     child_path = [(child_move, child_value)]
                     if value < best_value:

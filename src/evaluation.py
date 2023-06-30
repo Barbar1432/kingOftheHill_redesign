@@ -7,7 +7,7 @@ class evaluation:
     def board_evaluation(self,board,move_count):
         whitePoints = 0
         blackPoints = 0
-        print(move_count)
+        #print(move_count)
         pst = PST()
         black_positions = np.where(board < 0)
         white_positions = np.where(board > 0)
