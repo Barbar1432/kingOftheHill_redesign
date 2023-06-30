@@ -121,12 +121,39 @@ class Board:
         for key, value_list in move_dict.items():
             for value in value_list:
                 child_node_list.append((key, value))  # Store the move and resulting board
+
+        child_node_list = self.move_sorting(child_node_list)
+        """for x,y in child_node_list:
+            if self.is_quite_move(x, y) == 0:
+                print("ZAAA",0)
+            else:
+
+                print("ZAAA", 1)"""
         return child_node_list
 
+    def move_sorting(self,list):
+        middle_pos = {(2,2),(2,3),(2,4),(2,5),(3,2),(3,3),(3,4),(3,5),(4,2),(4,3),(4,4),(4,5),(5,2),(5,3),(5,4),(5,5)}
+        ordered_list = []
+        count = 0
+        for move, value in list:
+            if self.is_quite_move(move,value) == 0:
+                ordered_list.insert(0,(move,value))
+                count += 1
+            elif value in middle_pos:
+                ordered_list.insert(count, (move, value))
+            else:
+                ordered_list.append((move,value))
+
+
+        return ordered_list
+
+
     def is_quite_move(self, seq, dest):  # Check if the move is quite
-        if dest != 0 or self.move_generator.is_king_threatened(seq, dest, self.isMax, self.chessBoard):
+        if self.chessBoard[dest[0]][dest[1]] != 0 or self.move_generator.is_king_threatened(seq, dest, self.isMax, self.chessBoard):
+            #print(0, "ÇIKTIIII")
             return 0
         else:
+            #print(1 ,"ÇIKTIIII")
             return 1
 
     def quite_search(self, node, depth, alpha, beta, is_max, path):  # Quiescence search
@@ -241,7 +268,7 @@ class Board:
             return -1
         move = path[0]
         sqSelected, sqDest = move
-        print(sqSelected)
+
         self.move_piece(sqSelected, sqDest, self.chessBoard)
         self.move_count += 1
         return sqSelected, sqDest
