@@ -34,8 +34,8 @@ class Board:
         self.can_castle_black_right = True
         self.move_generator = moveGenerator()
         self.eval = evaluation()
+        self.move_count =0
         self.last_move = None
-        self.move_count = 0
 
     def draw_board(self, screen):
         for row in range(8):
@@ -77,7 +77,42 @@ class Board:
             self.move_count+=1
             self.last_move = (sqSelected, sqDest)
 
+    def zugsortierung(self, node, isMax):
+        child_node_list = []
+        if isMax:
+            positions = np.where(node > 0)
+            move_dict = self.move_generator.legalMoves(node, positions, isMax, self.can_castle_white_right,
+                                                       self.can_castle_white_left)
+        else:
+            positions = np.where(node < 0)
+            move_dict = self.move_generator.legalMoves(node, positions, isMax, self.can_castle_black_right,
+                                                       self.can_castle_black_left)
+        for key, value_list in move_dict.items():
+            for value in value_list:
+                child_node_list.append((key, value))  # Store the move and resulting board
 
+        child_node_list = self.move_sorting(child_node_list)
+        """for x,y in child_node_list:
+            if self.is_quite_move(x, y) == 0:
+                print("ZAAA",0)
+            else:
+
+                print("ZAAA", 1)"""
+        return child_node_list
+
+    def move_sorting(self, list):
+        middle_pos = {(2, 2), (2, 3), (2, 4), (2, 5), (3, 2), (3, 3), (3, 4), (3, 5), (4, 2), (4, 3), (4, 4), (4, 5),
+                      (5, 2), (5, 3), (5, 4), (5, 5)}
+        ordered_list = []
+        count = 0
+        for move, value in list:
+            if self.is_quite_move(move, value) == 0:
+                ordered_list.insert(0, (move, value))
+                count += 1
+            elif value in middle_pos:
+                ordered_list.insert(count, (move, value))
+            else:
+                ordered_list.append((move, value))
 
     def castle_move(self, sqSelected, sqDest):
         if self.can_castle_white_right:
@@ -108,162 +143,12 @@ class Board:
             if sqSelected == (0, 4) or sqSelected == (0, 0):
                 self.can_castle_black_left = False
 
-
-    def generate_child_node(self, node,isMax):
-        child_node_list = []
-        if isMax:
-            positions = np.where(node > 0)
-            move_dict = self.move_generator.legalMoves(node, positions, isMax, self.can_castle_white_right,
-                                                       self.can_castle_white_left)
-        else:
-            positions = np.where(node < 0)
-            move_dict = self.move_generator.legalMoves(node, positions,isMax, self.can_castle_black_right,self.can_castle_black_left)
-        for key, value_list in move_dict.items():
-            for value in value_list:
-                child_node_list.append((key, value))  # Store the move and resulting board
-
-        child_node_list = self.move_sorting(child_node_list)
-        """for x,y in child_node_list:
-            if self.is_quite_move(x, y) == 0:
-                print("ZAAA",0)
-            else:
-
-                print("ZAAA", 1)"""
-        return child_node_list
-
-    def move_sorting(self,list):
-        middle_pos = {(2,2),(2,3),(2,4),(2,5),(3,2),(3,3),(3,4),(3,5),(4,2),(4,3),(4,4),(4,5),(5,2),(5,3),(5,4),(5,5)}
-        ordered_list = []
-        count = 0
-        for move, value in list:
-            if self.is_quite_move(move,value) == 0:
-                ordered_list.insert(0,(move,value))
-                count += 1
-            elif value in middle_pos:
-                ordered_list.insert(count, (move, value))
-            else:
-                ordered_list.append((move,value))
-
-
-        return ordered_list
-
-
     def is_quite_move(self, seq, dest):  # Check if the move is quite
-        if self.chessBoard[dest[0]][dest[1]] != 0 or self.move_generator.is_king_threatened(seq, dest, self.isMax, self.chessBoard):
-            #print(0, "ÇIKTIIII")
+        if self.chessBoard[dest[0]][dest[1]] != 0 or self.move_generator.is_king_threatened(seq, dest, self.isMax,
+                                                                                            self.chessBoard):
             return 0
         else:
-            #print(1 ,"ÇIKTIIII")
             return 1
-    def quite_search_count(self, node, depth, alpha, beta, is_max, k, path):  # Quiescence search
-        k += 1
-        if is_max:
-            best_value = alpha
-            best_path = path
-            for child_move, child_value, in self.generate_child_node(node, is_max):
-                if not self.is_quite_move(child_move, child_value):
-                    child_board = np.copy(node)
-                    self.move_piece_alphabeta(child_move, child_value, child_board,
-                                              True)  # Update the board with the move
-                    value = self.eval.board_evaluation(child_board, self.move_count)
-                    child_path = [(child_move, child_value)]
-                    if value > best_value:
-                        best_value = value
-                        best_path = path + child_path
-                    if best_value >= beta:
-                        break
-            return best_value, best_path, k
-
-        else:
-            best_value = beta
-            best_path = path
-            for child_move, child_value, in self.generate_child_node(node, is_max):
-                if not self.is_quite_move(child_move, child_value):
-                    child_board = np.copy(node)
-                    self.move_piece_alphabeta(child_move, child_value, child_board,
-                                              False)  # Update the board with the move
-                    value = self.eval.board_evaluation(child_board, self.move_count)
-                    child_path = [(child_move, child_value)]
-                    if value < best_value:
-                        best_value = value
-                        best_path = path + child_path
-                    if best_value <= alpha:
-                        break
-            return best_value, best_path, k
-
-    def alpha_beta_count(self, node, depth, alpha, beta, is_max, k=0, path=[]):
-        originalAlpha = alpha
-
-        hash_key = self.board_hash(node)
-        if hash_key in transposition_table:
-
-            entry = transposition_table[hash_key]
-            if entry['depth'] >= depth:
-                if entry['flag'] == 'exact':
-
-                    return entry['value'], entry['path'], k
-
-                elif entry['flag'] == 'lowerbound':
-                    alpha = max(alpha, entry['value'])
-                elif entry['flag'] == 'upperbound':
-                    beta = min(beta, entry['value'])
-                if alpha >= beta:
-                    return entry['value'], entry['path'], k
-        k += 1
-        if self.gameOver(node, is_max):
-            return self.eval.board_evaluation(node, self.move_count), path, k
-        """if depth == 0:
-            return self.eval.board_evaluation(node, self.move_count), path, k"""
-        if depth == 0:
-            # Quiescence search
-            value, child_path, k = self.quite_search_count(node, depth, alpha, beta, is_max, k, path)
-            return value, child_path, k
-        if is_max:
-            best_value = alpha
-            best_path = None
-            for child_move, child_value, in self.generate_child_node(node, is_max):
-                child_board = np.copy(node)
-                self.move_piece_alphabeta(child_move, child_value, child_board, True)  # Update the board with the move
-
-                value, child_path, k = self.alpha_beta_count(child_board, depth - 1, best_value, beta, False, k,
-                                                             path + [(child_move, child_value)])
-                if value > best_value:
-                    best_value = value
-                    best_path = child_path
-                if best_value >= beta:  # Beta-Cutoff
-                    break
-
-            if best_value <= alpha:
-                flag = 'upperbound'
-            elif best_value >= beta:
-                flag = 'lowerbound'
-            else:
-                flag = 'exact'
-            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
-            return best_value, best_path, k
-        else:
-            best_value = beta
-            best_path = None
-            for child_move, child_value in self.generate_child_node(node, is_max):
-                child_board = np.copy(node)
-                self.move_piece_alphabeta(child_move, child_value, child_board, False)  # Update the board with the move
-
-                value, child_path, k = self.alpha_beta_count(child_board, depth - 1, alpha, best_value, True, k,
-                                                             path + [(child_move, child_value)])
-                if value < best_value:
-                    best_value = value
-                    best_path = child_path
-                if best_value <= alpha:  # Alpha-Cutoff
-                    break
-
-            if best_value <= alpha:
-                flag = 'upperbound'
-            elif best_value >= beta:
-                flag = 'lowerbound'
-            else:
-                flag = 'exact'
-            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
-            return best_value, best_path, k
 
     def quite_search(self, node, depth, alpha, beta, is_max, path):  # Quiescence search
         if is_max:
@@ -300,7 +185,7 @@ class Board:
                         break
             return best_value, best_path
 
-    def alpha_beta(self, node, depth, alpha, beta, is_max, path=[]):
+    def alpha_beta_hashing(self, node, depth, alpha, beta, is_max, path=[]):
         originalAlpha = alpha
 
         hash_key = self.board_hash(node)
@@ -327,11 +212,11 @@ class Board:
         if is_max:
             best_value = alpha
             best_path = None
-            for child_move, child_value, in self.generate_child_node(node,is_max):
+            for child_move, child_value, in self.zugsortierung(node,is_max):
                 child_board = np.copy(node)
                 self.move_piece_alphabeta(child_move, child_value, child_board, True) # Update the board with the move
 
-                value, child_path = self.alpha_beta(child_board, depth - 1, best_value, beta, False,path + [(child_move, child_value)])
+                value, child_path = self.alpha_beta_hashing(child_board, depth - 1, best_value, beta, False,path + [(child_move, child_value)])
                 if value > best_value:
                     best_value = value
                     best_path = child_path
@@ -349,11 +234,11 @@ class Board:
         else:
             best_value = beta
             best_path = None
-            for child_move, child_value in self.generate_child_node(node,is_max):
+            for child_move, child_value in self.zugsortierung(node,is_max):
                 child_board = np.copy(node)
                 self.move_piece_alphabeta(child_move, child_value, child_board, False)# Update the board with the move
 
-                value, child_path = self.alpha_beta(child_board, depth - 1, alpha, best_value, True,
+                value, child_path = self.alpha_beta_hashing(child_board, depth - 1, alpha, best_value, True,
                                                     path + [(child_move, child_value)])
                 if value < best_value:
                     best_value = value
@@ -370,14 +255,58 @@ class Board:
             transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
             return best_value, best_path
 
+    def generate_child_node(self, node,isMax):
+        child_node_list = []
+        if isMax:
+            positions = np.where(node > 0)
+            move_dict = self.move_generator.legalMoves(node, positions, isMax, self.can_castle_white_right,
+                                                       self.can_castle_white_left)
+        else:
+            positions = np.where(node < 0)
+            move_dict = self.move_generator.legalMoves(node, positions,isMax, self.can_castle_black_right,self.can_castle_black_left)
+        for key, value_list in move_dict.items():
+            for value in value_list:
+                child_node_list.append((key, value))  # Store the move and resulting board
+        return child_node_list
+
+    def alpha_beta(self, node, depth, alpha, beta, is_max, path=[]):
+        if depth == 0 or self.gameOver(node,is_max):
+            return self.eval.board_evaluation(node,self.move_count), path
+        if is_max:
+            best_value = alpha
+            best_path = None
+            for child_move, child_value, in self.generate_child_node(node,is_max):
+                child_board = np.copy(node)
+                self.move_piece_alphabeta(child_move, child_value, child_board, True) # Update the board with the move
+
+                value, child_path = self.alpha_beta(child_board, depth - 1, best_value, beta, False, path + [(child_move, child_value)])
+                if value > best_value:
+                    best_value = value
+                    best_path = child_path
+                if best_value >= beta:  # Beta-Cutoff
+                    break
+            return best_value, best_path
+        else:
+            best_value = beta
+            best_path = None
+            for child_move, child_value in self.generate_child_node(node,is_max):
+                child_board = np.copy(node)
+                self.move_piece_alphabeta(child_move, child_value, child_board, False)# Update the board with the move
+
+                value, child_path = self.alpha_beta(child_board, depth - 1, alpha, best_value, True,
+                                                    path + [(child_move, child_value)])
+                if value < best_value:
+                    best_value = value
+                    best_path = child_path
+                if best_value <= alpha:  # Alpha-Cutoff
+                    break
+            return best_value, best_path
+
     def bot_plays(self):
         _, path = self.alpha_beta(self.chessBoard, 3, float("-inf"), float("inf"), self.isMax)
-        # Game is over
-        if path == [] or path is None:
-            return -1
         move = path[0]
         sqSelected, sqDest = move
-
+        print(sqSelected)
         self.move_piece(sqSelected, sqDest, self.chessBoard)
         self.move_count += 1
         return sqSelected, sqDest
@@ -410,29 +339,13 @@ class Board:
                 return True
         if isMax:
           positions = np.where(board > 0)
-          moves = self.move_generator.legalMoves(board, positions, isMax, self.can_castle_white_right,
-                                                 self.can_castle_white_left)
-          if all(element == [] for element in list(moves.values())):
+          if len (self.move_generator.legalMoves(board, positions, isMax, self.can_castle_white_right,self.can_castle_white_left))==0:
              return True
-        else:
+        if not isMax:
             positions = np.where(board < 0)
-            moves = self.move_generator.legalMoves(board, positions, isMax, self.can_castle_white_right,
-                                                   self.can_castle_white_left)
-            if all(element == [] for element in list(moves.values())):
+            if len( self.move_generator.legalMoves(board, positions, self.isMax, self.can_castle_black_right,self.can_castle_black_left)) ==0:
                 return True
         return False
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
