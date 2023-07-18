@@ -170,11 +170,12 @@ def game_process(queue_game, queue_bot, queue_anim, queue_text, queue_textbool, 
 
     AI = True
     bot_is_running = False
+    game_over = False
     running = True
     while running:
-        # Game Over --- TODO: Add checkmate and stalemate game_over
         if chess_board.white_hill_win or chess_board.black_hill_win:
             ui_handler.set_caption("Game Over")
+            game_over = True
             queue_bot.put("quit")
             queue_anim.put("quit")
             queue_timer.put("quit")
@@ -186,6 +187,9 @@ def game_process(queue_game, queue_bot, queue_anim, queue_text, queue_textbool, 
                 queue_timer.put("quit")
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Not allowed to click if the game is over or not players turn
+                if not chess_board.isMax or game_over:
+                    break
                 # Get the position of the mouse click
                 # If clicked outside the board break
                 mouse_pos_check = pygame.mouse.get_pos()
@@ -214,7 +218,10 @@ def game_process(queue_game, queue_bot, queue_anim, queue_text, queue_textbool, 
                     # Update the chess board accordingly
 
                     chess_board.move_piece(chess_board.selected_square, sqDest, chess_board.chessBoard)
-                    queue_timer.put("black")
+                    if chess_board.last_condition != "move_invalid":
+                        queue_timer.put("black")
+                    if chess_board.white_hill_win is True:
+                        game_over = True
 
                     # Draw played chess board
 
@@ -225,7 +232,7 @@ def game_process(queue_game, queue_bot, queue_anim, queue_text, queue_textbool, 
                     chess_board.selected_square = None
 
         # Play bots turn, send signal 'bot' to bot_process
-        if chess_board.isMax is False and not bot_is_running:
+        if chess_board.isMax is False and not bot_is_running and not game_over:
             bot_is_running = True
             queue_bot.put("bot")
             queue_bot.put(game_algorithm)
@@ -281,8 +288,9 @@ def game_process(queue_game, queue_bot, queue_anim, queue_text, queue_textbool, 
             # Got Signal 'quit', game over
             if item == "quit":
                 ui_handler.set_caption("Game Over")
+                game_over = True
             # Got Signal 'update', bot successfully played update chess board
-            elif item == "update":
+            elif item == "update" and game_over is False:
                 print("Updated")
                 chess_board = queue_game.get()
                 ui_handler.draw_board(chess_board)
@@ -317,10 +325,29 @@ def game_process(queue_game, queue_bot, queue_anim, queue_text, queue_textbool, 
             # Got Signal 'white', update white timer
             if item == "white":
                 timer_string = queue_timertext.get()
+                # Time game over
+                if timer_string == "00:00":
+                    dialogue = animator.dialogues("time_done_player")
+                    queue_anim.put("text")
+                    queue_anim.put(dialogue)
+                    ui_handler.set_caption("Game Over")
+                    game_over = True
+                    queue_bot.put("quit")
+                    queue_anim.put("quit")
+                    queue_timer.put("quit")
                 ui_handler.draw_timer("white", timer_string)
             # Got Signal 'black', update black timer
             elif item == "black":
                 timer_string = queue_timertext.get()
+                if timer_string == "00:00":
+                    dialogue = animator.dialogues("time_done_queen")
+                    queue_anim.put("text")
+                    queue_anim.put(dialogue)
+                    ui_handler.set_caption("Game Over")
+                    game_over = True
+                    queue_bot.put("quit")
+                    queue_anim.put("quit")
+                    queue_timer.put("quit")
                 ui_handler.draw_timer("black", timer_string)
 
         # Highlight the selected square if one is selected

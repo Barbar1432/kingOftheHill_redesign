@@ -180,7 +180,7 @@ class BoardVisuals:
             self.screen.blit(text_playas_hint, (260, 218))
 
             text_time = self.button_font.render("Time(min)", False, (57, 50, 40))  # Time
-            self.screen.blit(text_time, (270, 293))
+            self.screen.blit(text_time, (267, 293))
             text_20 = self.button_font.render("20", False, (57, 50, 40))  # Time 20
             self.screen.blit(text_20, (548, 293))
             text_30 = self.button_font.render("30", False, (57, 50, 40))  # Time 30
