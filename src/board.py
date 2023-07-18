@@ -115,7 +115,7 @@ class Board:
             for value in value_list:
                 child_node_list.append((key, value))  # Store the move and resulting board
 
-        child_node_list = self.move_sorting(child_node_list)
+        child_node_list = self.move_sorting(child_node_list, node, isMax)
         """for x,y in child_node_list:
             if self.is_quite_move(x, y) == 0:
                 print("ZAAA",0)
@@ -124,19 +124,21 @@ class Board:
                 print("ZAAA", 1)"""
         return child_node_list
 
-    def move_sorting(self, list):
+    def move_sorting(self, list, node, ismax):
         middle_pos = {(2, 2), (2, 3), (2, 4), (2, 5), (3, 2), (3, 3), (3, 4), (3, 5), (4, 2), (4, 3), (4, 4), (4, 5),
                       (5, 2), (5, 3), (5, 4), (5, 5)}
         ordered_list = []
         count = 0
         for move, value in list:
-            if self.is_quite_move(move, value) == 0:
+            if self.is_quite_move(node,ismax, move, value) == 0:
                 ordered_list.insert(0, (move, value))
                 count += 1
             elif value in middle_pos:
                 ordered_list.insert(count, (move, value))
             else:
                 ordered_list.append((move, value))
+
+        return ordered_list
 
     def castle_move(self, sqSelected, sqDest):
         if self.can_castle_white_right:
@@ -305,6 +307,8 @@ class Board:
         for key, value_list in move_dict.items():
             for value in value_list:
                 child_node_list.append((key, value))  # Store the move and resulting board
+
+        child_node_list = self.move_sorting(child_node_list, node, isMax)
         return child_node_list
 
     def alpha_beta(self, node, depth, alpha, beta, is_max, path=[]):
@@ -345,7 +349,7 @@ class Board:
         key = self.board_hash(node)
 
         if key in transposition_table:
-            
+
             tt_entry = transposition_table[key]
             if tt_entry[1] >= depth:
                 return tt_entry[0], path
