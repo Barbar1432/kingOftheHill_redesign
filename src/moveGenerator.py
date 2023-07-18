@@ -379,7 +379,18 @@ class moveGenerator:
                 legalMoves[(kR,4)].append(x)
             return legalMoves
 
+    def legalMovesWithoutCastling(self, board, positions, isMax):
+        legalMoves = {}
+        row_indices, col_indices = positions
 
+        for row, col in zip(row_indices, col_indices):
+            pos = (row, col)
+            possible_moves_list = self.get_possible_moves(board, pos)
+            legalMoves[pos] = []
+            for pM in possible_moves_list:
+                if self.isLegal(pos, pM, board, isMax, possible_moves_list) and self.is_king_threatened(pos, pM, isMax, board) is False:
+                    legalMoves[pos].append(pM)
+        return legalMoves
     def isLegal(self, start_pos, dest_pos,board,isMax,possible_moves_list):
         start_row, start_col = start_pos
         dest_row, dest_col = dest_pos
@@ -406,31 +417,31 @@ class moveGenerator:
         else :
             return True
 
-    def is_king_threatened(self, start_pos, des_pos,isMax,board):
+    def is_king_threatened(self, start_pos, des_pos, isMax, board):
         if isMax:
-           kingPos = np.where (board==2000)
-           positions =np.where (board<0)
+            kingPos = np.where(board == 2000)
+            positions = np.where(board < 0)
         else:
             kingPos = np.where(board == -2000)
-            positions = np.where(board >0)
-        king_row = kingPos[0]
-        king_col = kingPos[1]
-        king = (king_row,king_col)
+            positions = np.where(board > 0)
+        king_row, king_col = kingPos
+        for r, c in zip(king_row, king_col):
+            king = (r, c)
         row, column = start_pos
         a, b = des_pos
         dest = board[a][b]
         pinned = board[row][column]
         if (start_pos == king):
-            king = (a,b)
-            king_row=a
-            king_col=b
+            king = des_pos
+        king_row, king_col = king
         board[row][column] = 0
         board[a][b] = pinned
         row_indices, col_indices = positions
         for x, y in zip(row_indices, col_indices):
-
+            if board[x][y] != 0 and ((board[x][y] > 0 and board[king_row][king_col] < 0) or (
+                    board[x][y] < 0 and board[king_row][king_col] > 0)):
                 sq = (x, y)
-                if  self.get_possible_moves(board,sq).__contains__(king):
+                if self.get_possible_moves(board, sq).__contains__(king):
                     board[row][column] = pinned
                     board[a][b] = dest
                     return True

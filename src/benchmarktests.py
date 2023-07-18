@@ -222,11 +222,11 @@ elif testing == 1:
     array4 = (
         timeit.repeat(stmt='alpha_beta_depth1()', setup='from __main__ import alpha_beta_depth1', repeat=5, number=1))
     array1 = (
-        timeit.repeat(stmt='alpha_beta_depth1()', setup='from __main__ import alpha_beta_depth1', repeat=3, number=1))
+        timeit.repeat(stmt='alpha_beta_depth1()', setup='from __main__ import alpha_beta_depth1', repeat=10, number=1))
     array2 = (
-        timeit.repeat(stmt='alpha_beta_depth2()', setup='from __main__ import alpha_beta_depth2', repeat=3, number=1))
+        timeit.repeat(stmt='alpha_beta_depth2()', setup='from __main__ import alpha_beta_depth2', repeat=10, number=1))
     array3 = (
-        timeit.repeat(stmt='alpha_beta_depth3()', setup='from __main__ import alpha_beta_depth3', repeat=3, number=1))
+        timeit.repeat(stmt='alpha_beta_depth3()', setup='from __main__ import alpha_beta_depth3', repeat=10, number=1))
     """array11 = (
         timeit.repeat(stmt='alpha_beta_depth1q()', setup='from __main__ import alpha_beta_depth1q', repeat=3, number=1))
     array22 = (
@@ -235,19 +235,19 @@ elif testing == 1:
         timeit.repeat(stmt='alpha_beta_depth3q()', setup='from __main__ import alpha_beta_depth3q', repeat=3, number=1))
     """
 
-    x = range(1, 4)
+    x = range(1, 11)
     fig, axs = plt.subplots(3, 2)
-    axs[0, 0].plot(x, array1, 'tab:blue')
+    axs[0, 0].plot(x, array1, 'tab:cyan')
     axs[0, 0].set_title('AlphaBeta with Depth: 1')
     axs[0, 0].set_ylabel('time (s)')
     """axs[0, 1].plot(x, array11, 'tab:cyan')
     axs[0, 1].set_title('AlphaBeta with Quite Search Depth: 1')"""
-    axs[1, 0].plot(x, array2, 'tab:red')
+    axs[1, 0].plot(x, array2, 'tab:orange')
     axs[1, 0].set_title('AlphaBeta with Depth: 2')
     axs[1, 0].set_ylabel('time (s)')
     """axs[1, 1].plot(x, array22, 'tab:orange')
     axs[1, 1].set_title('AlphaBeta with Quite Search Depth: 2')"""
-    axs[2, 0].plot(x, array3, 'tab:purple')
+    axs[2, 0].plot(x, array3, 'tab:pink')
     axs[2, 0].set_title('AlphaBeta with Depth: 3')
     axs[2, 0].set_ylabel('time (s)')
     axs[2, 0].set_xlabel('repeat (n)')
