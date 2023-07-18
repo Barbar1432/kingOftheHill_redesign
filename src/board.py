@@ -14,6 +14,7 @@ LIGHT_GREEN = (158, 194, 133)
 transposition_table = {}
 
 
+
 class Board:
     def __init__(self):
         # Create the chess board
@@ -300,30 +301,24 @@ class Board:
                         break
             return best_value, best_path
 
-    def alpha_beta(self, node, depth, alpha, beta, is_max, path=[]):
-        originalAlpha = alpha
+    def alpha_beta(self, node, depth, alpha, beta, is_max,  count_1,path=[]):
 
-        hash_key = self.board_hash(node)
-        if hash_key in transposition_table:
+        key = self.board_hash(node)
 
-            entry = transposition_table[hash_key]
-            if entry['depth'] >= depth:
-                if entry['flag'] == 'exact':
+        if key in transposition_table:
+            print("girdi")
+            tt_entry = transposition_table[key]
+            if tt_entry[1] >= depth:
+                return tt_entry[0], path, count_1
 
-                    return entry['value'], entry['path']
 
-                elif entry['flag'] == 'lowerbound':
-                    alpha = max(alpha, entry['value'])
-                elif entry['flag'] == 'upperbound':
-                    beta = min(beta, entry['value'])
-                if alpha >= beta:
-                    return entry['value'], entry['path']
-        if self.gameOver(node, is_max):
-            return self.eval.board_evaluation(node,self.move_count), path
+
+        """if self.gameOver(node, is_max):
+            return self.eval.board_evaluation(node,self.move_count), path"""
         if depth == 0:
             # Quiescence search
             value, child_path = self.quite_search(node, depth, alpha, beta, is_max, path)
-            return value, child_path
+            return value, child_path, count_1
         if is_max:
             best_value = alpha
             best_path = None
@@ -331,21 +326,16 @@ class Board:
                 child_board = np.copy(node)
                 self.move_piece_alphabeta(child_move, child_value, child_board, True) # Update the board with the move
 
-                value, child_path = self.alpha_beta(child_board, depth - 1, best_value, beta, False,path + [(child_move, child_value)])
+                value, child_path, count_1 = self.alpha_beta(child_board, depth - 1, best_value, beta, False,count_1,path + [(child_move, child_value)])
                 if value > best_value:
                     best_value = value
                     best_path = child_path
                 if best_value >= beta:  # Beta-Cutoff
                     break
-
-            if best_value <= alpha:
-                flag = 'upperbound'
-            elif best_value >= beta:
-                flag = 'lowerbound'
-            else:
-                flag = 'exact'
-            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
-            return best_value, best_path
+            transposition_table[key] = (best_value, depth)
+            count_1 = count_1 + 1
+            print(count_1)
+            return best_value, best_path, count_1
         else:
             best_value = beta
             best_path = None
@@ -353,7 +343,7 @@ class Board:
                 child_board = np.copy(node)
                 self.move_piece_alphabeta(child_move, child_value, child_board, False)# Update the board with the move
 
-                value, child_path = self.alpha_beta(child_board, depth - 1, alpha, best_value, True,
+                value, child_path, count_1 = self.alpha_beta(child_board, depth - 1, alpha, best_value, True,count_1,
                                                     path + [(child_move, child_value)])
                 if value < best_value:
                     best_value = value
@@ -361,17 +351,14 @@ class Board:
                 if best_value <= alpha:  # Alpha-Cutoff
                     break
 
-            if best_value <= alpha:
-                flag = 'upperbound'
-            elif best_value >= beta:
-                flag = 'lowerbound'
-            else:
-                flag = 'exact'
-            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
-            return best_value, best_path
+            transposition_table[key] = (best_value, depth)
+            count_1 = count_1 + 1
+            print(count_1)
+            return best_value, best_path, count_1
 
     def bot_plays(self):
-        _, path = self.alpha_beta(self.chessBoard, 3, float("-inf"), float("inf"), self.isMax)
+        _, path, c = self.alpha_beta(self.chessBoard, 3, float("-inf"), float("inf"), self.isMax,0)
+        print(c)
         # Game is over
         if path == [] or path is None:
             return -1
