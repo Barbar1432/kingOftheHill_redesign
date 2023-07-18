@@ -183,7 +183,7 @@ class Board:
         if is_max:
             best_value = alpha
             best_path = path
-            for child_move, child_value, in self.generate_child_node_without_castling(node, is_max):
+            for child_move, child_value, in self.generate_child_node(node, is_max):
                 if not self.is_quite_move(node, is_max, child_move, child_value):
                     #print("Not a quite move")
                     child_board = np.copy(node)
@@ -199,7 +199,7 @@ class Board:
         else:
             best_value = beta
             best_path = path
-            for child_move, child_value in self.generate_child_node_without_castling(node, is_max):
+            for child_move, child_value in self.generate_child_node(node, is_max):
                 if not self.is_quite_move(node, is_max, child_move, child_value):
                     print("Not a quit move")
                     child_board = np.copy(node)
@@ -212,91 +212,7 @@ class Board:
                         break
             #print("Returned:", best_value, best_path)
             return best_value, best_path
-
-    def alpha_beta_hashing(self, node, depth, alpha, beta, is_max, path=[]):
-        originalAlpha = alpha
-
-        hash_key = self.board_hash(node)
-        if hash_key in transposition_table:
-
-            entry = transposition_table[hash_key]
-            if entry['depth'] >= depth:
-                if entry['flag'] == 'exact':
-
-                    return entry['value'], entry['path']
-
-                elif entry['flag'] == 'lowerbound':
-                    alpha = max(alpha, entry['value'])
-                elif entry['flag'] == 'upperbound':
-                    beta = min(beta, entry['value'])
-                if alpha >= beta:
-                    return entry['value'], entry['path']
-        if self.gameOver(node, is_max):
-            return self.eval.board_evaluation(node,self.move_count), path
-        if depth == 0:
-            # Quiescence search
-            value, child_path = self.quite_search(node, depth, alpha, beta, is_max, path)
-            return value, child_path
-        if is_max:
-            best_value = alpha
-            best_path = None
-            for child_move, child_value, in self.zugsortierung(node,is_max):
-                child_board = np.copy(node)
-                self.move_piece_alphabeta(child_move, child_value, child_board, True) # Update the board with the move
-
-                value, child_path = self.alpha_beta_hashing(child_board, depth - 1, best_value, beta, False, path + [(child_move, child_value)])
-                if value > best_value:
-                    best_value = value
-                    best_path = child_path
-                if best_value >= beta:  # Beta-Cutoff
-                    break
-
-            if best_value <= alpha:
-                flag = 'upperbound'
-            elif best_value >= beta:
-                flag = 'lowerbound'
-            else:
-                flag = 'exact'
-            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
-            return best_value, best_path
-        else:
-            best_value = beta
-            best_path = None
-            for child_move, child_value in self.zugsortierung(node,is_max):
-                child_board = np.copy(node)
-                self.move_piece_alphabeta(child_move, child_value, child_board, False)# Update the board with the move
-
-                value, child_path = self.alpha_beta_hashing(child_board, depth - 1, alpha, best_value, True,
-                                                    path + [(child_move, child_value)])
-                if value < best_value:
-                    best_value = value
-                    best_path = child_path
-                if best_value <= alpha:  # Alpha-Cutoff
-                    break
-
-            if best_value <= alpha:
-                flag = 'upperbound'
-            elif best_value >= beta:
-                flag = 'lowerbound'
-            else:
-                flag = 'exact'
-            transposition_table[hash_key] = {'value': best_value, 'flag': flag, 'depth': depth, 'path': best_path}
-            return best_value, best_path
-
     def generate_child_node(self, node,isMax):
-        child_node_list = []
-        if isMax:
-            positions = np.where(node > 0)
-            move_dict = self.move_generator.legalMoves(node, positions, isMax, self.can_castle_white_right,
-                                                       self.can_castle_white_left)
-        else:
-            positions = np.where(node < 0)
-            move_dict = self.move_generator.legalMoves(node, positions,isMax, self.can_castle_black_right,self.can_castle_black_left)
-        for key, value_list in move_dict.items():
-            for value in value_list:
-                child_node_list.append((key, value))  # Store the move and resulting board
-        return child_node_list
-    def generate_child_node_without_castling(self, node,isMax):
         child_node_list = []
         if isMax:
             positions = np.where(node > 0)
@@ -312,39 +228,6 @@ class Board:
         return child_node_list
 
     def alpha_beta(self, node, depth, alpha, beta, is_max, path=[]):
-        if depth == 0 or self.gameOver(node,is_max):
-            return self.eval.board_evaluation(node,self.move_count), path
-        if is_max:
-            best_value = alpha
-            best_path = None
-            for child_move, child_value, in self.generate_child_node(node,is_max):
-                child_board = np.copy(node)
-                self.move_piece_alphabeta(child_move, child_value, child_board, True) # Update the board with the move
-
-                value, child_path = self.alpha_beta(child_board, depth - 1, best_value, beta, False, path + [(child_move, child_value)])
-                if value > best_value:
-                    best_value = value
-                    best_path = child_path
-                if best_value >= beta:  # Beta-Cutoff
-                    break
-            return best_value, best_path
-        else:
-            best_value = beta
-            best_path = None
-            for child_move, child_value in self.generate_child_node(node,is_max):
-                child_board = np.copy(node)
-                self.move_piece_alphabeta(child_move, child_value, child_board, False)# Update the board with the move
-
-                value, child_path = self.alpha_beta(child_board, depth - 1, alpha, best_value, True,
-                                                    path + [(child_move, child_value)])
-                if value < best_value:
-                    best_value = value
-                    best_path = child_path
-                if best_value <= alpha:  # Alpha-Cutoff
-                    break
-            return best_value, best_path
-
-    def alpha_beta_without_castling(self, node, depth, alpha, beta, is_max, path=[]):
 
         key = self.board_hash(node)
 
@@ -368,10 +251,10 @@ class Board:
         if is_max:
             best_value = alpha
             best_path = None
-            for child_move, child_value, in self.generate_child_node_without_castling(node, is_max):
+            for child_move, child_value, in self.generate_child_node(node, is_max):
                 child_board = np.copy(node)
                 self.move_piece_alphabeta(child_move, child_value, child_board, True)  # Update the board with the move
-                value, child_path = self.alpha_beta_without_castling(child_board, depth - 1, best_value, beta, False,
+                value, child_path = self.alpha_beta(child_board, depth - 1, best_value, beta, False,
                                                                 path + [(child_move, child_value)])
                 if value > best_value:
                     best_value = value
@@ -383,10 +266,10 @@ class Board:
         else:
             best_value = beta
             best_path = None
-            for child_move, child_value in self.generate_child_node_without_castling(node, is_max):
+            for child_move, child_value in self.generate_child_node(node, is_max):
                 child_board = np.copy(node)
                 self.move_piece_alphabeta(child_move, child_value, child_board, False)  # Update the board with the move
-                value, child_path = self.alpha_beta_without_castling(child_board, depth - 1, alpha, best_value, True,
+                value, child_path = self.alpha_beta(child_board, depth - 1, alpha, best_value, True,
                                                                 path + [(child_move, child_value)])
                 if value < best_value:
                     best_value = value
@@ -397,7 +280,7 @@ class Board:
             return best_value, best_path
     def bot_plays(self, algorithm):
         if algorithm == "alphabeta":
-            _, path = self.alpha_beta_without_castling(self.chessBoard, 5, float("-inf"), float("inf"), self.isMax)
+            _, path = self.alpha_beta(self.chessBoard, 3, float("-inf"), float("inf"), self.isMax)
             if path is None or len(path) == 0:
                 self.last_condition = "defeat"
                 self.urgency = True

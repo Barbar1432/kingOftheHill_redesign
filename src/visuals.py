@@ -223,8 +223,8 @@ class BoardVisuals:
             text_line9 = self.about_font.render("choosing, then with the use of", False, (57, 50, 40))
             text_line10 = self.about_font.render("alpha-beta algorithm, hash table ", False, (57, 50, 40))
             text_line11 = self.about_font.render("and heuristics a smarter AI,", False, (57, 50, 40))
-            text_line12 = self.about_font.render("lastly, with the use of machine", False, (57, 50, 40))
-            text_line13 = self.about_font.render("learning our final AI.", False, (57, 50, 40))
+            text_line12 = self.about_font.render("lastly, with the use of monte", False, (57, 50, 40))
+            text_line13 = self.about_font.render("carlo algorithm our final AI.", False, (57, 50, 40))
 
             self.screen.blit(text_line2, (105, 135))
             self.screen.blit(text_line3, (95, 150))
