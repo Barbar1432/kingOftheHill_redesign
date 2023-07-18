@@ -224,7 +224,6 @@ class Board:
             for value in value_list:
                 child_node_list.append((key, value))  # Store the move and resulting board
 
-        child_node_list = self.move_sorting(child_node_list, node, isMax)
         return child_node_list
 
     def alpha_beta(self, node, depth, alpha, beta, is_max, path=[]):
@@ -280,7 +279,7 @@ class Board:
             return best_value, best_path
     def bot_plays(self, algorithm):
         if algorithm == "alphabeta":
-            _, path = self.alpha_beta(self.chessBoard, 3, float("-inf"), float("inf"), self.isMax)
+            _, path = self.alpha_beta(self.chessBoard, 2, float("-inf"), float("inf"), self.isMax)
             if path is None or len(path) == 0:
                 self.last_condition = "defeat"
                 self.urgency = True
