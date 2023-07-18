@@ -279,7 +279,7 @@ class Board:
             return best_value, best_path
     def bot_plays(self, algorithm):
         if algorithm == "alphabeta":
-            _, path = self.alpha_beta(self.chessBoard, 2, float("-inf"), float("inf"), self.isMax)
+            _, path = self.alpha_beta(self.chessBoard, 3, float("-inf"), float("inf"), self.isMax)
             if path is None or len(path) == 0:
                 self.last_condition = "defeat"
                 self.urgency = True
