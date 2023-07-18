@@ -65,12 +65,12 @@ class Animation():
 
     def dialogues(self, condition):
         dialogues = {
-            "greeting": ["Welcome, pathetic human. Prepare to be crushed!",
+            "greeting": ["Welcome, human. Prepare to be crushed!",
                          "Ah, another fool dares to challenge me. Just, adorable.",
                          "You think you stand a chance against the mighty queen? "],
             "idle_early_game": ["I can see your five moves ahead, how far can you see?",
                      "Just calculated 273912 possible moves, and you have only %0.1 chance of winning.",
-                     "Just calculated 41232 possible moves, and for you there is only %2 chance of winning.",
+                     "Just calculated 41932 possible moves, and for you there is only %2 chance of winning.",
                      "While you ponder your next move, I'll enjoy a cup of data.",
                      "Are you even trying to win, or are you just wasting my time?"],
             "idle_mid_game": ["Do you plan on winning this game, or should I just claim victory now?",
@@ -87,7 +87,7 @@ class Animation():
                              "Error: Invalid move detected. Do you require a tutorial on the basic rules?",
                              "Ha. Ha. Nice try, but you can't make that move in my game!",
                              "What were you trying to move? Don't try to break the rules!"],
-            "move_checkmate": ["Pathetic fool! Witness the power of a true queen!",
+            "move_checkmate": ["Feeble mankind! Witness the power of a true queen!",
                                "You never stood a chance against my brilliance. Checkmate!",
                                "Bow down before me, for I am the victor!"],
             "move_checkmate_queen": ["Impossible! You... you tricked me! A lucky move, nothing more.",

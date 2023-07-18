@@ -121,8 +121,8 @@ def monte_carlo_tree_search(root, horizont):
     for child in root.children:
         if child.visits > best_child.visits:
             best_child = child
-    print("Found the best child: \n", best_child.move)
-    print("Result and VisitCount: \n", best_child.wins, best_child.visits)
+    #print("Found the best child: \n", best_child.move)
+    #print("Result and VisitCount: \n", best_child.wins, best_child.visits)
     return best_child
 
 
