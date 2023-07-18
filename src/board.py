@@ -341,6 +341,15 @@ class Board:
             return best_value, best_path
 
     def alpha_beta_without_castling(self, node, depth, alpha, beta, is_max, path=[]):
+
+        key = self.board_hash(node)
+
+        if key in transposition_table:
+            
+            tt_entry = transposition_table[key]
+            if tt_entry[1] >= depth:
+                return tt_entry[0], path
+
         if self.gameOver(node, is_max):
             return self.eval.board_evaluation(node, self.move_count), path
         if depth == 0:
@@ -365,6 +374,7 @@ class Board:
                     best_path = child_path
                 if best_value >= beta:  # Beta-Cutoff
                     break
+            transposition_table[key] = (best_value, depth)
             return best_value, best_path
         else:
             best_value = beta
@@ -379,6 +389,7 @@ class Board:
                     best_path = child_path
                 if best_value <= alpha:  # Alpha-Cutoff
                     break
+            transposition_table[key] = (best_value, depth)
             return best_value, best_path
     def bot_plays(self, algorithm):
         if algorithm == "alphabeta":
@@ -443,33 +454,3 @@ class Board:
             if all(element == [] for element in list(moves.values())):
                 return True
         return False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
