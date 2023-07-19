@@ -195,10 +195,10 @@ class Board:
         child_node_list = []
         if isMax:
             positions = np.where(node > 0)
-            move_dict = self.move_generator.legalMovesWithoutCastling(node, positions, isMax)
+            move_dict = self.move_generator.legalMovesProcess(node, positions, isMax)
         else:
             positions = np.where(node < 0)
-            move_dict = self.move_generator.legalMovesWithoutCastling(node, positions, isMax)
+            move_dict = self.move_generator.legalMovesProcess(node, positions, isMax)
         for key, value_list in move_dict.items():
             for value in value_list:
                 child_node_list.append((key, value))  # Store the move and resulting board
@@ -215,7 +215,7 @@ class Board:
             if tt_entry[1] >= depth:
                 return tt_entry[0], path
 
-        if self.gameOver(node, is_max) or depth == 0:
+        if depth == 0 or self.gameOver(node, is_max):
             return self.eval.board_evaluation(node, self.move_count), path
 
         """if depth == 0 or self.gameOver(node, is_max):
@@ -306,12 +306,12 @@ class Board:
                 return True
         if isMax:
           positions = np.where(board > 0)
-          moves = self.move_generator.legalMovesWithoutCastling(board, positions, isMax)
+          moves = self.move_generator.legalMovesProcess(board, positions, isMax)
           if all(element == [] for element in list(moves.values())):
              return True
         else:
             positions = np.where(board < 0)
-            moves = self.move_generator.legalMovesWithoutCastling(board, positions, isMax)
+            moves = self.move_generator.legalMovesProcess(board, positions, isMax)
             if all(element == [] for element in list(moves.values())):
                 return True
         return False

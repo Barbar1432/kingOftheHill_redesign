@@ -62,7 +62,7 @@ def simulate_game(node, horizont):
     move_count = node.move_count
     while not result and i < horizont:
         # Random choice
-        best_move = random.choice(list(generate_child_node_without_castling(chess_board, isMax)))
+        best_move = random.choice(list(generate_child_node(chess_board, isMax)))
         new_child_node = np.copy(chess_board)
         move_piece_monte_carlo(best_move[0], best_move[1], new_child_node)
         chess_board = new_child_node
@@ -97,7 +97,7 @@ def monte_carlo_tree_search(root, horizont):
 
         # Expansion
         if node.visits > 0:
-            child_states = generate_child_node_without_castling(node.move, node.isMax)
+            child_states = generate_child_node(node.move, node.isMax)
             # For each possible move create a child node
             if child_states:
                 for child_state in child_states:
@@ -126,11 +126,11 @@ def monte_carlo_tree_search(root, horizont):
     return best_child
 
 
-def generate_child_node_without_castling(node, isMax):
+def generate_child_node(node, isMax):
     child_node_list = []
     positions = np.where(node > 0) if isMax else np.where(node < 0)
     move_generator = moveGenerator()
-    move_dict = move_generator.legalMovesWithoutCastling(node, positions, isMax)
+    move_dict = move_generator.legalMovesProcess(node, positions, isMax)
     for key, value_list in move_dict.items():
         for value in value_list:
             child_node_list.append((key, value))  # Store the selected and destination
@@ -147,12 +147,12 @@ def game_over(chess_board, is_max, move_generator):
             return -1000
     if is_max:
         positions = np.where(chess_board > 0)
-        moves = move_generator.legalMovesWithoutCastling(chess_board, positions, is_max)
+        moves = move_generator.legalMovesProcess(chess_board, positions, is_max)
         if all(element == [] for element in list(moves.values())):
             return -500
     else:
         positions = np.where(chess_board < 0)
-        moves = move_generator.legalMovesWithoutCastling(chess_board, positions, is_max)
+        moves = move_generator.legalMovesProcess(chess_board, positions, is_max)
         if all(element == [] for element in list(moves.values())):
             return 500
 

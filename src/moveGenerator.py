@@ -379,7 +379,7 @@ class moveGenerator:
                 legalMoves[(kR,4)].append(x)
             return legalMoves
 
-    def legalMovesWithoutCastling(self, board, positions, isMax):
+    def legalMovesProcess(self, board, positions, isMax):
         legalMoves = {}
         row_indices, col_indices = positions
 
