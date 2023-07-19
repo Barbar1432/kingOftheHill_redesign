@@ -101,28 +101,6 @@ class Board:
                 self.last_condition = "move_invalid"
                 self.urgency = True
 
-    def zugsortierung(self, node, isMax):
-        child_node_list = []
-        if isMax:
-            positions = np.where(node > 0)
-            move_dict = self.move_generator.legalMoves(node, positions, isMax, self.can_castle_white_right,
-                                                       self.can_castle_white_left)
-        else:
-            positions = np.where(node < 0)
-            move_dict = self.move_generator.legalMoves(node, positions, isMax, self.can_castle_black_right,
-                                                       self.can_castle_black_left)
-        for key, value_list in move_dict.items():
-            for value in value_list:
-                child_node_list.append((key, value))  # Store the move and resulting board
-
-        child_node_list = self.move_sorting(child_node_list, node, isMax)
-        """for x,y in child_node_list:
-            if self.is_quite_move(x, y) == 0:
-                print("ZAAA",0)
-            else:
-
-                print("ZAAA", 1)"""
-        return child_node_list
 
     def move_sorting(self, list, node, ismax):
         middle_pos = {(2, 2), (2, 3), (2, 4), (2, 5), (3, 2), (3, 3), (3, 4), (3, 5), (4, 2), (4, 3), (4, 4), (4, 5),
@@ -130,7 +108,7 @@ class Board:
         ordered_list = []
         count = 0
         for move, value in list:
-            if self.is_quite_move(node,ismax, move, value) == 0:
+            if self.is_quite_move(node, ismax, move, value) == 0:
                 ordered_list.insert(0, (move, value))
                 count += 1
             elif value in middle_pos:
@@ -212,14 +190,15 @@ class Board:
                         break
             #print("Returned:", best_value, best_path)
             return best_value, best_path
-    def generate_child_node(self, node,isMax):
+
+    def generate_child_node(self, node, isMax):
         child_node_list = []
         if isMax:
             positions = np.where(node > 0)
             move_dict = self.move_generator.legalMovesWithoutCastling(node, positions, isMax)
         else:
             positions = np.where(node < 0)
-            move_dict = self.move_generator.legalMovesWithoutCastling(node, positions,isMax)
+            move_dict = self.move_generator.legalMovesWithoutCastling(node, positions, isMax)
         for key, value_list in move_dict.items():
             for value in value_list:
                 child_node_list.append((key, value))  # Store the move and resulting board
@@ -236,15 +215,9 @@ class Board:
             if tt_entry[1] >= depth:
                 return tt_entry[0], path
 
-        if self.gameOver(node, is_max):
+        if self.gameOver(node, is_max) or depth == 0:
             return self.eval.board_evaluation(node, self.move_count), path
-        if depth == 0:
-            # Quiescence search
-            value, child_path = self.quite_search(node, depth, alpha, beta, is_max, path)
-            if value == float('inf') or value == float('-inf'):
-                value = self.eval.board_evaluation(node, self.move_count)
-                return value, child_path
-            return value, child_path
+
         """if depth == 0 or self.gameOver(node, is_max):
             return self.eval.board_evaluation(node, self.move_count), path"""
         if is_max:
@@ -277,6 +250,7 @@ class Board:
                     break
             transposition_table[key] = (best_value, depth)
             return best_value, best_path
+
     def bot_plays(self, algorithm):
         if algorithm == "alphabeta":
             _, path = self.alpha_beta(self.chessBoard, 3, float("-inf"), float("inf"), self.isMax)
@@ -323,6 +297,7 @@ class Board:
             piece_value = chessBoard[from_row][from_col]
             chessBoard[to_row][to_col] = piece_value
             chessBoard[from_row][from_col] = 0
+
     def gameOver (self,board,isMax):
         central_squares = [(3, 3), (3, 4), (4, 3), (4, 4)]
         for pos in central_squares:
